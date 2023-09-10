@@ -22,6 +22,8 @@
 
     <modules>
         <module>deploy</module>
+        <module>service</module>
+        <module>dal</module>
     </modules>
 
     <dependencies>

@@ -41,7 +41,7 @@
       fx:controller="com.liang.deploy.controller.PrimaryController">
     <MenuBar VBox.vgrow="NEVER">
         <Menu mnemonicParsing="false" text="文件">
-            <MenuItem mnemonicParsing="false" text="新建连接" onAction="#openNewConnectionView"/>
+            <MenuItem mnemonicParsing="false" onAction="#openNewConnectionView" text="新建连接"/>
             <MenuItem mnemonicParsing="false" text="Open…"/>
             <Menu mnemonicParsing="false" text="Open Recent"/>
             <SeparatorMenuItem mnemonicParsing="false"/>
@@ -70,11 +70,10 @@
             <MenuItem mnemonicParsing="false" text="About MyHelloApp"/>
         </Menu>
     </MenuBar>
-    <SplitPane dividerPositions="0.2505567928730512, 0.7505567928730512" focusTraversable="true"
-               VBox.vgrow="ALWAYS">
-        <AnchorPane prefHeight="552.0" prefWidth="163.0">
-            <Label alignment="CENTER" layoutX="14.0" layoutY="14.0" minWidth="60.0"
-                   style="&#10;" text="连接列表" textAlignment="CENTER">
+    <SplitPane dividerPositions="0.2505567928730512, 0.7505567928730512" focusTraversable="true" VBox.vgrow="ALWAYS">
+        <AnchorPane prefHeight="552.0" prefWidth="250.0" maxWidth="250.0">
+            <Label alignment="CENTER" layoutX="14.0" layoutY="14.0" minWidth="60.0" style="&#10;" text="连接列表"
+                   textAlignment="CENTER">
                 <font>
                     <Font size="18.0" fx:id="x1"/>
                 </font>
@@ -82,11 +81,14 @@
                     <Color red="0.624" green="0.624" blue="0.624" fx:id="x2"/>
                 </textFill>
             </Label>
+            <!-- 连接列表 -->
+            <TreeView fx:id="connectionTree" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                      AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0"/>
         </AnchorPane>
         <ScrollPane>
             <AnchorPane id="Content" prefHeight="545.0" prefWidth="430.0">
-                <Label alignment="CENTER" font="$x1" layoutX="14.0" layoutY="14.0" style="&#10;"
-                       text="sql编排" textAlignment="CENTER" textFill="$x2"/>
+                <Label alignment="CENTER" font="$x1" layoutX="14.0" layoutY="14.0" style="&#10;" text="sql编排"
+                       textAlignment="CENTER" textFill="$x2"/>
             </AnchorPane>
         </ScrollPane>
         <AnchorPane prefHeight="552.0" prefWidth="311.0">

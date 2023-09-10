@@ -6,8 +6,12 @@ import de.felixroske.jfxsupport.AbstractJavaFxApplicationSupport;
 
 import javafx.stage.Stage;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
 
+@MapperScan(basePackages = {"com.liang.dal.mapper"})
+@ComponentScan(basePackages = {"com.liang.dal", "com.liang.service", "com.liang.deploy"})
 @SpringBootApplication
 public class Application extends AbstractJavaFxApplicationSupport {
 

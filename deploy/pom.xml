@@ -19,6 +19,12 @@
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>com.liang</groupId>
+            <artifactId>service</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
         <!-- javaFx -->
         <dependency>
             <groupId>org.openjfx</groupId>
