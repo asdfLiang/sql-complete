@@ -7,7 +7,7 @@ import lombok.Data;
  * @author by liangzj
  */
 @Data
-public class ConnectionDO {
+public class ConnectionDefinitionDO {
 
     private Long id;
 

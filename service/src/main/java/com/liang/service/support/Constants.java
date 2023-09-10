@@ -6,4 +6,6 @@ package com.liang.service.support;
  */
 public final class Constants {
     public static final String JDBC_REGEX = "jdbc:mysql://[^/]+/(\\w+).*";
+
+    public static final String MYSQL_8_CLASS_NAME = "com.mysql.cj.jdbc.Driver";
 }

@@ -1,4 +1,4 @@
-create table main.connection
+create table main.connection_definition
 (
     id              INTEGER not null
         constraint pk_id
@@ -12,5 +12,5 @@ create table main.connection
 );
 
 create unique index main.uniq_connection_id
-    on main.connection (connection_id);
+    on main.connection_definition (connection_id);
 
