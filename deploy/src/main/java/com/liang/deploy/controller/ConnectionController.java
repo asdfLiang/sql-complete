@@ -4,6 +4,7 @@ import static com.liang.service.support.Constants.JDBC_REGEX;
 
 import com.liang.deploy.action.AlertAction;
 import com.liang.service.connection.ConnectionService;
+import com.liang.service.manager.ConnectionDefinitionManager;
 import com.liang.service.support.dto.ConnectionDTO;
 import com.liang.service.support.exceptions.BaseException;
 
@@ -14,6 +15,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -28,6 +30,7 @@ public class ConnectionController {
     @FXML private TextField passwordField;
     @FXML private Button commitBtn;
 
+    @Autowired private ConnectionDefinitionManager connectionDefinitionManager;
     @Autowired private ConnectionService connectionService;
 
     /** 保存新的连接 */
@@ -55,7 +58,19 @@ public class ConnectionController {
         stage.close();
     }
 
-    public boolean validParams() {
+    @FXML
+    private void initialize() {
+        urlField.textProperty()
+                .addListener(
+                        (observable, oldValue, newValue) -> {
+                            String dbName = connectionDefinitionManager.getDatabaseName(newValue);
+                            if (StringUtils.isNotBlank(dbName)) {
+                                connectionNameField.setText(dbName);
+                            }
+                        });
+    }
+
+    private boolean validParams() {
         String connectionName = connectionNameField.getText();
         String url = urlField.getText();
         String username = usernameField.getText();

@@ -9,6 +9,7 @@ import com.liang.service.support.dto.ConnectionDTO;
 import com.liang.service.support.events.ConnectionsChangeEvent;
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -52,7 +53,25 @@ public class ConnectionDefinitionManager {
         return allList.stream().map(ConnectionDTOConverter::convert).toList();
     }
 
-    private String getDatabaseName(String url) {
+    public String getDatabaseName(String url) {
+        if (StringUtils.isBlank(url) || !url.matches(Constants.JDBC_REGEX)) {
+            return null;
+        }
+
         return url.replaceAll(Constants.JDBC_REGEX, "$1");
+    }
+
+    public static void main(String[] args) {
+        ConnectionDefinitionManager manager = new ConnectionDefinitionManager();
+        String url1 = "jdbc";
+        String url2 = "1234";
+        String url3 = "jdbc:mysql://localhost:3306/test";
+        System.out.println(url1.matches(Constants.JDBC_REGEX));
+        System.out.println(url2.matches(Constants.JDBC_REGEX));
+        System.out.println(url3.matches(Constants.JDBC_REGEX));
+
+        System.out.println(manager.getDatabaseName(url1));
+        System.out.println(manager.getDatabaseName(url2));
+        System.out.println(manager.getDatabaseName(url3));
     }
 }

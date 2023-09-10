@@ -2,25 +2,21 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.AnchorPane?>
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1"
-            xmlns="http://javafx.com/javafx/20.0.1"
-            maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
             minWidth="-Infinity"
-            prefHeight="275.0" prefWidth="600.0"
+            prefHeight="275.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/20.0.1"
             fx:controller="com.liang.deploy.controller.ConnectionController">
-    <Label layoutX="27.0" layoutY="25.0" text="连接名称"/>
-    <Label layoutX="21.0" layoutY="75.0" text="服务器地址"/>
-    <Label layoutX="34.0" layoutY="125.0" text="用户名"/>
-    <Label layoutX="39.0" layoutY="175.0" text="密码"/>
+    <Label layoutX="16.0" layoutY="29.0" text="服务器地址"/>
+    <Label layoutX="28.0" layoutY="79.0" text="用户名"/>
+    <Label layoutX="34.0" layoutY="129.0" text="密码"/>
+    <Label layoutX="22.0" layoutY="179.0" text="连接名称"/>
 
-    <TextField fx:id="connectionNameField" layoutX="88.0" layoutY="25.0" prefHeight="23.0" prefWidth="464.0"/>
-    <TextField fx:id="urlField" layoutX="89.0" layoutY="75.0" prefHeight="23.0" prefWidth="464.0"
-               promptText="jdbc:mysql://localhost:3306/databaseName"/>
-    <TextField fx:id="usernameField" layoutX="89.0" layoutY="125.0" prefHeight="23.0" prefWidth="464.0"/>
-    <PasswordField fx:id="passwordField" layoutX="89.0" layoutY="175.0" prefHeight="23.0" prefWidth="464.0">
-    </PasswordField>
+    <TextField fx:id="urlField" layoutX="88.0" layoutY="25.0" prefHeight="23.0" prefWidth="464.0"
+               promptText="jdbc:mysql://localhost:3306/database"/>
+    <TextField fx:id="usernameField" layoutX="89.0" layoutY="75.0" prefHeight="23.0" prefWidth="464.0"/>
+    <PasswordField fx:id="passwordField" layoutX="89.0" layoutY="125.0" prefHeight="23.0" prefWidth="464.0"/>
+    <TextField fx:id="connectionNameField" layoutX="89.0" layoutY="175.0" prefHeight="23.0" prefWidth="464.0"/>
 
-    <Button fx:id="commitBtn" layoutX="505.0" layoutY="229.0" mnemonicParsing="false" prefHeight="23.0" prefWidth="48.0"
-            text="保存"
-            onAction="#save"/>
+    <Button fx:id="commitBtn" layoutX="505.0" layoutY="229.0" mnemonicParsing="false" onAction="#save" prefHeight="23.0"
+            prefWidth="48.0" text="保存"/>
 </AnchorPane>
