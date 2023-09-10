@@ -6,6 +6,7 @@ import com.liang.service.connection.ConnectionService;
 import com.liang.service.support.converter.ConnectionConverter;
 import com.liang.service.support.dto.ConnectionDTO;
 import com.liang.service.support.events.ConnectionsChangeEvent;
+import com.liang.service.support.exceptions.BaseException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -15,6 +16,9 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -31,6 +35,9 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     @Override
     public void save(ConnectionDTO dto) {
+        // 检查是否能够连接成功
+        testConnect(dto);
+
         // 保存
         ConnectionDO connectionDO = new ConnectionDO();
         BeanUtils.copyProperties(dto, connectionDO);
@@ -51,6 +58,24 @@ public class ConnectionServiceImpl implements ConnectionService {
         }
 
         return allList.stream().map(ConnectionConverter::convert).toList();
+    }
+
+    @Override
+    public void testConnect(ConnectionDTO dto) {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new BaseException(e.getMessage(), e);
+        }
+
+        try (Connection connection =
+                DriverManager.getConnection(dto.getUrl(), dto.getUsername(), dto.getPassword())) {
+            if (connection == null) {
+                throw new BaseException("数据库连接失败");
+            }
+        } catch (SQLException e) {
+            throw new BaseException(e.getMessage(), e);
+        }
     }
 
     private String getDatabaseName(String url) {

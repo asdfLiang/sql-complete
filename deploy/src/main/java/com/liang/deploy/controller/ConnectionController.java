@@ -2,8 +2,10 @@ package com.liang.deploy.controller;
 
 import static com.liang.service.support.Constants.JDBC_REGEX;
 
+import com.liang.deploy.action.AlertAction;
 import com.liang.service.connection.ConnectionService;
 import com.liang.service.support.dto.ConnectionDTO;
+import com.liang.service.support.exceptions.BaseException;
 
 import de.felixroske.jfxsupport.FXMLController;
 
@@ -37,7 +39,12 @@ public class ConnectionController {
         dto.setUrl(urlField.getText());
         dto.setUsername(usernameField.getText());
         dto.setPassword(passwordField.getText());
-        connectionService.save(dto);
+
+        try {
+            connectionService.save(dto);
+        } catch (BaseException e) {
+            AlertAction.error(e.getMessage());
+        }
 
         closeStage();
     }

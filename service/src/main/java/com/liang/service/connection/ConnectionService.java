@@ -15,4 +15,6 @@ public interface ConnectionService {
     void save(ConnectionDTO dto);
 
     List<ConnectionDTO> all();
+
+    void testConnect(ConnectionDTO dto);
 }

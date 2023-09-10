@@ -80,6 +80,7 @@ public class PrimaryController {
 
         //
         flushConnectionList();
+        connectionTree.getRoot().setExpanded(true);
     }
 
     @EventListener(classes = {ConnectionsChangeEvent.class})
@@ -99,6 +100,8 @@ public class PrimaryController {
     }
 
     public void showTables(TreeItem<ConnectionVO> treeItem, String connectionId) {
+        treeItem.getChildren().removeAll(treeItem.getChildren());
+
         System.out.println(connectionId);
     }
 }
