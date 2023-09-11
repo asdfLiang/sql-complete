@@ -17,7 +17,7 @@ public class ConnectionDefinitionDO {
 
     private String url;
 
-    private String databaseName;
+    private String schemaName;
 
     private String username;
 

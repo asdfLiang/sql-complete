@@ -5,20 +5,19 @@ import com.liang.dal.mapper.ConnectionDefinitionMapper;
 import com.liang.service.support.Constants;
 import com.liang.service.support.dto.ConnectionDTO;
 import com.liang.service.support.exceptions.BaseException;
-
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.sql.DataSource;
 
 /**
  * @since 2023/9/10 20:00
@@ -27,32 +26,18 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 @Component
 public class ConnectionManager {
-    private static final ConcurrentHashMap<String, Connection> connectionMap =
+    /** Map<connectionId, DataSource> */
+    private static final ConcurrentHashMap<String, DataSource> dataSourceMap =
             new ConcurrentHashMap<>();
 
     @Autowired private ConnectionDefinitionMapper connectionMapper;
 
-    public Connection obtain(String connectionId) {
-        Connection connection = connectionMap.get(connectionId);
+    public Connection obtain(String connectionId) throws SQLException {
+        DataSource dataSource =
+                dataSourceMap.getOrDefault(connectionId, createDataSource(connectionId));
+        dataSourceMap.putIfAbsent(connectionId, dataSource);
 
-        try {
-            if (Objects.isNull(connection) || connection.isClosed()) {
-                connection = create(connectionId);
-                connectionMap.put(connectionId, connection);
-            }
-        } catch (SQLException e) {
-            try {
-                connection = connectionMap.remove(connectionId);
-                if (connection != null) {
-                    connection.close();
-                }
-            } catch (SQLException ex) {
-                throw new RuntimeException(ex);
-            }
-            throw new BaseException(e.getMessage(), e);
-        }
-
-        return connection;
+        return dataSource.getConnection();
     }
 
     public void testConnect(ConnectionDTO dto) {
@@ -66,43 +51,54 @@ public class ConnectionManager {
         }
     }
 
-    private Connection create(String connectionId) throws SQLException {
+    private DataSource createDataSource(String connectionId) {
         ConnectionDefinitionDO connectionDO = connectionMapper.selectOne(connectionId);
-        if (Objects.isNull(connectionDO)) throw new BaseException("连接信息不存在");
+        if (Objects.isNull(connectionDO)) {
+            log.error("connection definition not found, connectionId: {}", connectionId);
+            throw new BaseException("连接信息不存在，请重新创建数据库连接");
+        }
 
-        Connection connection;
-        connection =
-                DriverManager.getConnection(
-                        connectionDO.getUrl(),
-                        connectionDO.getUsername(),
-                        connectionDO.getPassword());
+        HikariConfig configuration = new HikariConfig();
+        configuration.setSchema(connectionDO.getSchemaName());
+        configuration.setJdbcUrl(connectionDO.getUrl());
+        configuration.setUsername(connectionDO.getUsername());
+        configuration.setPassword(connectionDO.getPassword());
+        configuration.setDriverClassName(Constants.MYSQL_8_CLASS_NAME);
+        configuration.setMaximumPoolSize(5);
 
-        return Optional.ofNullable(connection).orElseThrow(() -> new BaseException("数据库连接失败"));
+        return new HikariDataSource(configuration);
     }
 
-    @PostConstruct
-    public void postConstruct() {
-        try {
-            // 容器启动时加载数据库驱动
-            Class.forName(Constants.MYSQL_8_CLASS_NAME);
-        } catch (ClassNotFoundException e) {
+    public List<Map<String, Object>> executeQuery(
+            String connectionId, String sql, Object... params) {
+        try (Connection connection = obtain(connectionId);
+                PreparedStatement statement = connection.prepareStatement(sql)) {
+            for (int i = 0; i < params.length; i++) {
+                statement.setObject(i + 1, params[i]);
+            }
+            //
+            ResultSet resultSet = statement.executeQuery();
+
+            // 查询结果
+            List<Map<String, Object>> result = new ArrayList<>();
+            while (resultSet.next()) result.add(getRow(resultSet));
+
+            return result;
+        } catch (SQLException e) {
             throw new BaseException(e.getMessage(), e);
         }
     }
 
-    @PreDestroy
-    public void preDestroy() {
-        if (connectionMap.isEmpty()) return;
+    public Map<String, Object> getRow(ResultSet resultSet) throws SQLException {
+        ResultSetMetaData metaData = resultSet.getMetaData();
 
-        for (String connectionId : connectionMap.keySet()) {
-            try {
-                Connection connection = connectionMap.remove(connectionId);
-                if (connection != null) {
-                    connection.close();
-                }
-            } catch (SQLException e) {
-                log.error("connection close error, connectionId: {}", connectionId, e);
-            }
+        Map<String, Object> row = new HashMap<>();
+        for (int i = 1; i <= metaData.getColumnCount(); i++) {
+            String columnName = metaData.getColumnName(i);
+            Object columnValue = resultSet.getObject(i);
+            row.put(columnName, columnValue);
         }
+
+        return row;
     }
 }

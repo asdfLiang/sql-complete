@@ -63,7 +63,7 @@ public class ConnectionController {
         urlField.textProperty()
                 .addListener(
                         (observable, oldValue, newValue) -> {
-                            String dbName = connectionDefinitionManager.getDatabaseName(newValue);
+                            String dbName = connectionDefinitionManager.getSchemaName(newValue);
                             if (StringUtils.isNotBlank(dbName)) {
                                 connectionNameField.setText(dbName);
                             }

@@ -5,8 +5,8 @@ import com.liang.dal.mapper.ConnectionDefinitionMapper;
 import com.liang.service.support.Constants;
 import com.liang.service.support.converter.ConnectionDTOConverter;
 import com.liang.service.support.dto.ConnectionDTO;
-
 import com.liang.service.support.events.ConnectionsChangeEvent;
+
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.lang3.StringUtils;
@@ -18,6 +18,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -35,7 +36,7 @@ public class ConnectionDefinitionManager {
         ConnectionDefinitionDO connectionDO = new ConnectionDefinitionDO();
         BeanUtils.copyProperties(dto, connectionDO);
         connectionDO.setConnectionId(UUID.randomUUID().toString().replace("-", ""));
-        connectionDO.setDatabaseName(getDatabaseName(dto.getUrl()));
+        connectionDO.setSchemaName(getSchemaName(dto.getUrl()));
         Integer insert = connectionDefinitionMapper.insert(connectionDO);
 
         if (insert == null || insert == 0) log.warn("insert 0 lines connection definition.");
@@ -50,10 +51,20 @@ public class ConnectionDefinitionManager {
             return Collections.emptyList();
         }
 
-        return allList.stream().map(ConnectionDTOConverter::convert).toList();
+        return allList.stream()
+                .filter(Objects::nonNull)
+                .map(ConnectionDTOConverter::convert)
+                .toList();
     }
 
-    public String getDatabaseName(String url) {
+    public ConnectionDTO one(String connectionId) {
+        ConnectionDefinitionDO one = connectionDefinitionMapper.selectOne(connectionId);
+        if (Objects.isNull(one)) return null;
+
+        return ConnectionDTOConverter.convert(one);
+    }
+
+    public String getSchemaName(String url) {
         if (StringUtils.isBlank(url) || !url.matches(Constants.JDBC_REGEX)) {
             return null;
         }
@@ -70,8 +81,8 @@ public class ConnectionDefinitionManager {
         System.out.println(url2.matches(Constants.JDBC_REGEX));
         System.out.println(url3.matches(Constants.JDBC_REGEX));
 
-        System.out.println(manager.getDatabaseName(url1));
-        System.out.println(manager.getDatabaseName(url2));
-        System.out.println(manager.getDatabaseName(url3));
+        System.out.println(manager.getSchemaName(url1));
+        System.out.println(manager.getSchemaName(url2));
+        System.out.println(manager.getSchemaName(url3));
     }
 }

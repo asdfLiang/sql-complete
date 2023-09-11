@@ -17,4 +17,6 @@ public class ConnectionDTO {
     private String username;
 
     private String password;
+
+    private String schemaName;
 }

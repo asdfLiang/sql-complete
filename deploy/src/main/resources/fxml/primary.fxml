@@ -41,8 +41,8 @@
       fx:controller="com.liang.deploy.controller.PrimaryController">
     <MenuBar VBox.vgrow="NEVER">
         <Menu mnemonicParsing="false" text="文件">
-            <MenuItem mnemonicParsing="false" onAction="#openNewConnectionView" text="新建连接"/>
-            <MenuItem mnemonicParsing="false" text="Open…"/>
+            <MenuItem mnemonicParsing="false" onAction="#openNewConnectionView" text="新建"/>
+            <MenuItem mnemonicParsing="false" text="打开…"/>
             <Menu mnemonicParsing="false" text="Open Recent"/>
             <SeparatorMenuItem mnemonicParsing="false"/>
             <MenuItem mnemonicParsing="false" text="Close"/>

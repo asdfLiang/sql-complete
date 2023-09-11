@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ConnectionVO {
-    private String connectionId;
-    private String connectionName;
+public class ConnectionItemVO {
+    private String itemId;
+    private String itemName;
 }

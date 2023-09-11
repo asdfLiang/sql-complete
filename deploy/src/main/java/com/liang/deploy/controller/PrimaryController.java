@@ -1,10 +1,11 @@
 package com.liang.deploy.controller;
 
 import com.liang.deploy.controller.converter.ConnectionVOConverter;
-import com.liang.deploy.controller.vo.ConnectionVO;
+import com.liang.deploy.controller.vo.ConnectionItemVO;
 import com.liang.deploy.view.ConnectionView;
 import com.liang.service.connection.ConnectionService;
 import com.liang.service.support.dto.ConnectionDTO;
+import com.liang.service.support.dto.TableDTO;
 import com.liang.service.support.events.ConnectionsChangeEvent;
 
 import de.felixroske.jfxsupport.AbstractJavaFxApplicationSupport;
@@ -34,7 +35,7 @@ import java.util.List;
 public class PrimaryController {
     private final Stage rootStage = AbstractJavaFxApplicationSupport.getStage();
 
-    @FXML private TreeView<ConnectionVO> connectionTree;
+    @FXML private TreeView<ConnectionItemVO> connectionTree;
 
     @Autowired private ConnectionView connectionView;
     @Autowired private ConnectionService connectionService;
@@ -47,7 +48,7 @@ public class PrimaryController {
         Scene scene = new Scene(pane);
 
         Stage stage = new Stage();
-        stage.setTitle("新建连接");
+        stage.setTitle("数据库连接");
         stage.setScene(scene);
         stage.initOwner(rootStage);
         stage.initModality(Modality.APPLICATION_MODAL);
@@ -56,25 +57,27 @@ public class PrimaryController {
 
     @FXML
     public void initialize() {
-        connectionTree.setRoot(new TreeItem<>(new ConnectionVO("", "所有连接")));
+        connectionTree.setRoot(new TreeItem<>(new ConnectionItemVO("", "所有连接")));
         // 设置展示文案为数据库名称
         connectionTree.setCellFactory(
                 treeView ->
                         new TreeCell<>() {
                             @Override
-                            protected void updateItem(ConnectionVO item, boolean empty) {
+                            protected void updateItem(ConnectionItemVO item, boolean empty) {
                                 super.updateItem(item, empty);
-                                setText((empty || item == null) ? null : item.getConnectionName());
+                                setText((empty || item == null) ? null : item.getItemName());
                             }
                         });
 
         // 设置点击事件，点击连接后展示数据库连接的表
         connectionTree.setOnMouseClicked(
                 event -> {
-                    TreeItem<ConnectionVO> selectedItem =
+                    TreeItem<ConnectionItemVO> selectedItem =
                             connectionTree.getSelectionModel().getSelectedItem();
-                    if (selectedItem != null && selectedItem != connectionTree.getRoot()) {
-                        showTables(selectedItem, selectedItem.getValue().getConnectionId());
+                    if (selectedItem != null
+                            && selectedItem != connectionTree.getRoot()
+                            && !selectedItem.isExpanded()) {
+                        showTables(selectedItem, selectedItem.getValue().getItemId());
                     }
                 });
 
@@ -85,7 +88,7 @@ public class PrimaryController {
 
     @EventListener(classes = {ConnectionsChangeEvent.class})
     public void flushConnectionList() {
-        TreeItem<ConnectionVO> root = connectionTree.getRoot();
+        TreeItem<ConnectionItemVO> root = connectionTree.getRoot();
 
         // 查询所有连接信息
         List<ConnectionDTO> all = connectionService.all();
@@ -94,14 +97,25 @@ public class PrimaryController {
         // 刷新列表
         if (CollectionUtils.isEmpty(all)) return;
         for (ConnectionDTO dto : all) {
-            TreeItem<ConnectionVO> item = new TreeItem<>(ConnectionVOConverter.convert(dto));
+            ConnectionItemVO itemVO = ConnectionVOConverter.convert(dto);
+            TreeItem<ConnectionItemVO> item = new TreeItem<>(itemVO);
             root.getChildren().add(item);
         }
     }
 
-    public void showTables(TreeItem<ConnectionVO> treeItem, String connectionId) {
-        treeItem.getChildren().removeAll(treeItem.getChildren());
+    public void showTables(TreeItem<ConnectionItemVO> rootItem, String connectionId) {
+        if (rootItem.isExpanded()) {
+            return;
+        }
 
-        System.out.println(connectionId);
+        List<TableDTO> tables = connectionService.tables(connectionId);
+        rootItem.getChildren().removeAll(rootItem.getChildren());
+        for (TableDTO dto : tables) {
+            ConnectionItemVO itemVO = ConnectionVOConverter.convert(dto);
+            TreeItem<ConnectionItemVO> item = new TreeItem<>(itemVO);
+            // TODO 添加点击事件，展示当前表的列信息
+
+            rootItem.getChildren().add(item);
+        }
     }
 }
