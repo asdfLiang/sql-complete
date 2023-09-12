@@ -1,4 +1,4 @@
-package com.liang.service.support;
+package com.liang.service.support.constants;
 
 /**
  * @since 2023/9/10 13:57

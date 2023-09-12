@@ -1,9 +1,9 @@
 package com.liang.deploy.controller;
 
-import static com.liang.service.support.Constants.JDBC_REGEX;
+import static com.liang.service.support.constants.Constants.JDBC_REGEX;
 
 import com.liang.deploy.action.AlertAction;
-import com.liang.service.connection.ConnectionService;
+import com.liang.service.ConnectionService;
 import com.liang.service.manager.ConnectionDefinitionManager;
 import com.liang.service.support.dto.ConnectionDTO;
 import com.liang.service.support.exceptions.BaseException;

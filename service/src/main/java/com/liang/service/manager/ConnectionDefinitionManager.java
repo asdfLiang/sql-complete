@@ -2,7 +2,7 @@ package com.liang.service.manager;
 
 import com.liang.dal.entity.ConnectionDefinitionDO;
 import com.liang.dal.mapper.ConnectionDefinitionMapper;
-import com.liang.service.support.Constants;
+import com.liang.service.support.constants.Constants;
 import com.liang.service.support.converter.ConnectionDTOConverter;
 import com.liang.service.support.dto.ConnectionDTO;
 import com.liang.service.support.events.ConnectionsChangeEvent;

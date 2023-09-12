@@ -3,7 +3,7 @@ package com.liang.deploy.controller;
 import com.liang.deploy.controller.converter.ConnectionVOConverter;
 import com.liang.deploy.controller.vo.ConnectionItemVO;
 import com.liang.deploy.view.ConnectionView;
-import com.liang.service.connection.ConnectionService;
+import com.liang.service.ConnectionService;
 import com.liang.service.support.dto.ColumnDTO;
 import com.liang.service.support.dto.ConnectionDTO;
 import com.liang.service.support.dto.TableDTO;

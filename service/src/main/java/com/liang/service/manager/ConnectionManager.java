@@ -2,7 +2,7 @@ package com.liang.service.manager;
 
 import com.liang.dal.entity.ConnectionDefinitionDO;
 import com.liang.dal.mapper.ConnectionDefinitionMapper;
-import com.liang.service.support.Constants;
+import com.liang.service.support.constants.Constants;
 import com.liang.service.support.dto.ConnectionDTO;
 import com.liang.service.support.exceptions.BaseException;
 import com.zaxxer.hikari.HikariConfig;
@@ -30,12 +30,16 @@ public class ConnectionManager {
     private static final ConcurrentHashMap<String, DataSource> dataSourceMap =
             new ConcurrentHashMap<>();
 
-    @Autowired private ConnectionDefinitionMapper connectionMapper;
+    @Autowired private ConnectionDefinitionMapper connectionDefinitionMapper;
 
     public Connection obtain(String connectionId) throws SQLException {
-        DataSource dataSource =
-                dataSourceMap.getOrDefault(connectionId, createDataSource(connectionId));
-        dataSourceMap.putIfAbsent(connectionId, dataSource);
+        DataSource dataSource = dataSourceMap.get(connectionId);
+
+        if (Objects.isNull(dataSource)) {
+            dataSource = createDataSource(connectionId);
+            dataSourceMap.put(connectionId, dataSource);
+            log.info("create dataSource by connectionId: {}", connectionId);
+        }
 
         return dataSource.getConnection();
     }
@@ -47,12 +51,13 @@ public class ConnectionManager {
                 throw new BaseException("获取数据库连接失败");
             }
         } catch (SQLException e) {
+            log.error("test connect error | ", e);
             throw new BaseException(e.getMessage(), e);
         }
     }
 
     private DataSource createDataSource(String connectionId) {
-        ConnectionDefinitionDO connectionDO = connectionMapper.selectOne(connectionId);
+        ConnectionDefinitionDO connectionDO = connectionDefinitionMapper.selectOne(connectionId);
         if (Objects.isNull(connectionDO)) {
             log.error("connection definition not found, connectionId: {}", connectionId);
             throw new BaseException("连接信息不存在，请重新创建数据库连接");
@@ -85,6 +90,7 @@ public class ConnectionManager {
 
             return result;
         } catch (SQLException e) {
+            log.error("execute query error, connectionId: {}, sql: {}", connectionId, sql, e);
             throw new BaseException(e.getMessage(), e);
         }
     }

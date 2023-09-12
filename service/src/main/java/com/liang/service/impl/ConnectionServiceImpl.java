@@ -1,6 +1,6 @@
-package com.liang.service.connection.impl;
+package com.liang.service.impl;
 
-import com.liang.service.connection.ConnectionService;
+import com.liang.service.ConnectionService;
 import com.liang.service.manager.ConnectionDefinitionManager;
 import com.liang.service.manager.ConnectionManager;
 import com.liang.service.support.dto.ColumnDTO;
@@ -9,7 +9,6 @@ import com.liang.service.support.dto.TableDTO;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;

@@ -1,4 +1,4 @@
-package com.liang.service.connection;
+package com.liang.service;
 
 import com.liang.service.support.dto.ColumnDTO;
 import com.liang.service.support.dto.ConnectionDTO;
