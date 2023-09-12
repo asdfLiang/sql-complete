@@ -12,6 +12,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ConnectionItemVO {
-    private String itemId;
+    public static final String SCHEMA = "schema";
+    public static final String TABLE = "table";
+    public static final String COLUMN = "column";
+
+    private String connectionId;
     private String itemName;
+
+    /** schema,table */
+    private String itemType;
 }

@@ -3,19 +3,17 @@ package com.liang.service.connection.impl;
 import com.liang.service.connection.ConnectionService;
 import com.liang.service.manager.ConnectionDefinitionManager;
 import com.liang.service.manager.ConnectionManager;
+import com.liang.service.support.dto.ColumnDTO;
 import com.liang.service.support.dto.ConnectionDTO;
 import com.liang.service.support.dto.TableDTO;
 
-import com.liang.service.support.exceptions.BaseException;
 import lombok.extern.slf4j.Slf4j;
 
-import org.apache.ibatis.util.MapUtil;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -64,5 +62,24 @@ public class ConnectionServiceImpl implements ConnectionService {
         }
 
         return tables;
+    }
+
+    @Override
+    public List<ColumnDTO> descTable(String connectionId, String tableName) {
+        List<Map<String, Object>> list =
+                connectionManager.executeQuery(connectionId, "DESC " + tableName);
+        if (CollectionUtils.isEmpty(list)) return Collections.emptyList();
+
+        List<ColumnDTO> columns = new ArrayList<>();
+        for (Map<String, Object> map : list) {
+            ColumnDTO columnDTO = new ColumnDTO();
+            columnDTO.setField(String.valueOf(map.get("Field")));
+            columnDTO.setType(String.valueOf(map.get("Type")));
+            columnDTO.setNullable("YES".equals(map.get("Null")));
+            columnDTO.setPrimaryKey("PRI".equals(map.get("Key")));
+            columns.add(columnDTO);
+        }
+
+        return columns;
     }
 }

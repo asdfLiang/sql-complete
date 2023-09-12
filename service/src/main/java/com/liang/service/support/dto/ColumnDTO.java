@@ -8,9 +8,11 @@ import lombok.Data;
  */
 @Data
 public class ColumnDTO {
-    private String fieldName;
+    private String field;
 
-    private String comment;
+    private String type;
+
+    private boolean nullable;
 
     private boolean isPrimaryKey;
 }

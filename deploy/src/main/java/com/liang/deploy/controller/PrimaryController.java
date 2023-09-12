@@ -4,6 +4,7 @@ import com.liang.deploy.controller.converter.ConnectionVOConverter;
 import com.liang.deploy.controller.vo.ConnectionItemVO;
 import com.liang.deploy.view.ConnectionView;
 import com.liang.service.connection.ConnectionService;
+import com.liang.service.support.dto.ColumnDTO;
 import com.liang.service.support.dto.ConnectionDTO;
 import com.liang.service.support.dto.TableDTO;
 import com.liang.service.support.events.ConnectionsChangeEvent;
@@ -57,7 +58,7 @@ public class PrimaryController {
 
     @FXML
     public void initialize() {
-        connectionTree.setRoot(new TreeItem<>(new ConnectionItemVO("", "所有连接")));
+        connectionTree.setRoot(new TreeItem<>(new ConnectionItemVO("", "所有连接", "")));
         // 设置展示文案为数据库名称
         connectionTree.setCellFactory(
                 treeView ->
@@ -74,10 +75,8 @@ public class PrimaryController {
                 event -> {
                     TreeItem<ConnectionItemVO> selectedItem =
                             connectionTree.getSelectionModel().getSelectedItem();
-                    if (selectedItem != null
-                            && selectedItem != connectionTree.getRoot()
-                            && !selectedItem.isExpanded()) {
-                        showTables(selectedItem, selectedItem.getValue().getItemId());
+                    if (selectedItem != null && !selectedItem.isExpanded()) {
+                        expandConnectionItem(selectedItem);
                     }
                 });
 
@@ -103,18 +102,33 @@ public class PrimaryController {
         }
     }
 
-    public void showTables(TreeItem<ConnectionItemVO> rootItem, String connectionId) {
-        if (rootItem.isExpanded()) {
-            return;
-        }
+    private void expandConnectionItem(TreeItem<ConnectionItemVO> selectedItem) {
+        ConnectionItemVO value = selectedItem.getValue();
 
+        if (ConnectionItemVO.SCHEMA.equals(value.getItemType())) {
+            expandTables(selectedItem, value.getConnectionId());
+        } else if (ConnectionItemVO.TABLE.equals(value.getItemType())) {
+            expandColumns(selectedItem, value.getConnectionId(), value.getItemName());
+        }
+    }
+
+    private void expandTables(TreeItem<ConnectionItemVO> rootItem, String connectionId) {
         List<TableDTO> tables = connectionService.tables(connectionId);
         rootItem.getChildren().removeAll(rootItem.getChildren());
         for (TableDTO dto : tables) {
+            ConnectionItemVO itemVO = ConnectionVOConverter.convert(connectionId, dto);
+            TreeItem<ConnectionItemVO> item = new TreeItem<>(itemVO);
+            rootItem.getChildren().add(item);
+        }
+    }
+
+    private void expandColumns(
+            TreeItem<ConnectionItemVO> rootItem, String connectionId, String tableName) {
+        List<ColumnDTO> columns = connectionService.descTable(connectionId, tableName);
+        rootItem.getChildren().removeAll(rootItem.getChildren());
+        for (ColumnDTO dto : columns) {
             ConnectionItemVO itemVO = ConnectionVOConverter.convert(dto);
             TreeItem<ConnectionItemVO> item = new TreeItem<>(itemVO);
-            // TODO 添加点击事件，展示当前表的列信息
-
             rootItem.getChildren().add(item);
         }
     }
