@@ -81,10 +81,11 @@ public class ConnectionManager {
             for (int i = 0; i < params.length; i++) {
                 statement.setObject(i + 1, params[i]);
             }
-            //
+
+            // 执行查询sql
             ResultSet resultSet = statement.executeQuery();
 
-            // 查询结果
+            // 结果转换
             List<Map<String, Object>> result = new ArrayList<>();
             while (resultSet.next()) result.add(getRow(resultSet));
 
