@@ -71,7 +71,7 @@
         </Menu>
     </MenuBar>
     <SplitPane dividerPositions="0.2505567928730512, 0.7505567928730512" focusTraversable="true" VBox.vgrow="ALWAYS">
-        <AnchorPane prefHeight="552.0" prefWidth="250.0" maxWidth="250.0">
+        <AnchorPane maxWidth="250.0" prefHeight="552.0" prefWidth="250.0">
             <Label alignment="CENTER" layoutX="14.0" layoutY="14.0" minWidth="60.0" style="&#10;" text="连接列表"
                    textAlignment="CENTER">
                 <font>
@@ -82,15 +82,23 @@
                 </textFill>
             </Label>
             <!-- 连接列表 -->
-            <TreeView fx:id="connectionTree" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-                      AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0"/>
+            <TreeView fx:id="connectionTree" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                      AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
         </AnchorPane>
-        <ScrollPane>
-            <AnchorPane id="Content" prefHeight="545.0" prefWidth="430.0">
-                <Label alignment="CENTER" font="$x1" layoutX="14.0" layoutY="14.0" style="&#10;" text="sql编排"
-                       textAlignment="CENTER" textFill="$x2"/>
-            </AnchorPane>
-        </ScrollPane>
+        <TabPane fx:id="processTabPane" prefHeight="552.0" prefWidth="443.0" tabClosingPolicy="UNAVAILABLE"
+                 AnchorPane.bottomAnchor="0.0"
+                 AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <Tab text="首页">
+                <AnchorPane
+                        AnchorPane.bottomAnchor="0.0"
+                        AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <Hyperlink layoutX="190.0" layoutY="110.0" text="新建连接"
+                               onAction="#openNewConnectionView"/>
+                    <Hyperlink layoutX="190.0" layoutY="147.0" text="新建流程"
+                               onAction="#openNewProcessTab"/>
+                </AnchorPane>
+            </Tab>
+        </TabPane>
         <AnchorPane prefHeight="552.0" prefWidth="311.0">
             <Label alignment="CENTER" font="$x1" layoutX="14.0" layoutY="14.0" style="&#10;" text="查询结果"
                    textAlignment="CENTER" textFill="$x2"/>

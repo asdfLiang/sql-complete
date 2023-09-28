@@ -1,5 +1,6 @@
 package com.liang.deploy.controller;
 
+import com.liang.deploy.components.ProcessComponent;
 import com.liang.deploy.controller.converter.ConnectionVOConverter;
 import com.liang.deploy.controller.vo.ConnectionItemVO;
 import com.liang.deploy.view.ConnectionView;
@@ -14,11 +15,7 @@ import de.felixroske.jfxsupport.FXMLController;
 
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
-import javafx.scene.control.TreeCell;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Pane;
+import javafx.scene.control.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -37,6 +34,7 @@ public class PrimaryController {
     private final Stage rootStage = AbstractJavaFxApplicationSupport.getStage();
 
     @FXML private TreeView<ConnectionItemVO> connectionTree;
+    @FXML private TabPane processTabPane;
 
     @Autowired private ConnectionView connectionView;
     @Autowired private ConnectionService connectionService;
@@ -44,9 +42,7 @@ public class PrimaryController {
     /** 打开新建连接窗口 */
     @FXML
     public void openNewConnectionView() {
-        Pane pane = new AnchorPane(connectionView.getView());
-
-        Scene scene = new Scene(pane);
+        Scene scene = new Scene(connectionView.getView());
 
         Stage stage = new Stage();
         stage.setTitle("数据库连接");
@@ -54,6 +50,14 @@ public class PrimaryController {
         stage.initOwner(rootStage);
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.show();
+    }
+
+    /** 打开新建流程窗口 */
+    @FXML
+    public void openNewProcessTab() {
+        Tab tab = new Tab("新建流程", new ProcessComponent(processTabPane.getWidth()));
+
+        processTabPane.getTabs().add(tab);
     }
 
     @FXML
