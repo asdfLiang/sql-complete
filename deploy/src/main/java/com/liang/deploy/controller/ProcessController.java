@@ -62,8 +62,8 @@ public class ProcessController {
      */
     private Button addButton(VBox node) {
         Button addButton = new Button("+");
-        addButton.setPrefWidth(27);
-        addButton.setPrefHeight(27);
+        addButton.setPrefWidth(25);
+        addButton.setPrefHeight(25);
 
         addButton.setOnAction(event -> addSubNode(node));
         return addButton;
@@ -78,8 +78,8 @@ public class ProcessController {
      */
     private Button removeButton(VBox parent, VBox node) {
         Button removeButton = new Button("-");
-        removeButton.setPrefWidth(27);
-        removeButton.setPrefHeight(27);
+        removeButton.setPrefWidth(25);
+        removeButton.setPrefHeight(25);
 
         removeButton.setOnAction(
                 event -> {
