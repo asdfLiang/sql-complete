@@ -55,7 +55,8 @@ public class PrimaryController {
     /** 打开新建流程窗口 */
     @FXML
     public void openNewProcessTab() {
-        Tab tab = new Tab("新建流程", new ProcessComponent(processTabPane.getWidth()));
+        ScrollPane scrollPane = new ScrollPane(new ProcessComponent());
+        Tab tab = new Tab("新建流程", scrollPane);
 
         processTabPane.getTabs().add(tab);
     }
