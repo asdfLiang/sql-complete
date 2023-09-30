@@ -2,6 +2,7 @@ package com.liang.deploy.components;
 
 import com.liang.deploy.action.AlertAction;
 
+import com.liang.deploy.support.FxmlUtil;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -12,13 +13,20 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Line;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
+
+import java.util.Objects;
 
 /**
  * @since 2023/9/24 22:59
  * @author by liangzj
  */
 public class ProcessComponent extends AnchorPane {
+
+    private Class<? extends Pane> nodeContentPaneType;
+
+    private String nodeContentFxmlName;
 
     public ProcessComponent() {
         super();
@@ -28,6 +36,14 @@ public class ProcessComponent extends AnchorPane {
         this.getChildren().add(processRoot);
     }
 
+    public ProcessComponent(Class<? extends Pane> nodeContentPaneType) {
+        this.nodeContentPaneType = nodeContentPaneType;
+    }
+
+    public ProcessComponent(String nodeContentFxmlName) {
+        this.nodeContentFxmlName = nodeContentFxmlName;
+    }
+
     private VBox processRoot() {
         VBox node = new VBox();
         node.setAlignment(Pos.TOP_CENTER);
@@ -35,7 +51,7 @@ public class ProcessComponent extends AnchorPane {
 
         // 结构定义
         Button startButton = startButton();
-        Pane nodeContent = nodeContent();
+        Pane nodeContent = buildNodeContent();
         Button addButton = addButton(node);
         Line line1 = new Line(0, 0, 0, 30);
         Line line2 = new Line(0, 0, 0, 30);
@@ -54,7 +70,7 @@ public class ProcessComponent extends AnchorPane {
 
         // 结构定义
         Button removeButton = removeButton(parentNode, node);
-        Pane nodeContent = nodeContent();
+        Pane nodeContent = buildNodeContent();
         Button addButton = addButton(node);
         Line line2 = new Line(0, 0, 0, 30);
         HBox next = new HBox();
@@ -66,20 +82,19 @@ public class ProcessComponent extends AnchorPane {
         return node;
     }
 
-    /** 节点的主体 */
-    private Pane nodeContent() {
-        double TEXT_AREA_WIDTH = 350;
-        double TEXT_AREA_HEIGHT = 200;
+    /** 构建节点主题 */
+    private Pane buildNodeContent() {
 
-        TextArea textArea = new TextArea();
-        textArea.setPrefWidth(TEXT_AREA_WIDTH);
-        textArea.setPrefHeight(TEXT_AREA_HEIGHT);
-        textArea.setMaxWidth(TEXT_AREA_WIDTH);
-
-        HBox hBox = new HBox();
-        hBox.setAlignment(Pos.TOP_CENTER);
-        hBox.getChildren().add(textArea);
-        return hBox;
+        if (StringUtils.isNotBlank(nodeContentFxmlName)) {
+            return FxmlUtil.load(nodeContentFxmlName);
+        } else if (Objects.nonNull(nodeContentPaneType)) {
+            try {
+                return nodeContentPaneType.getConstructor().newInstance();
+            } catch (Exception e) {
+                return defaultNodeContent();
+            }
+        }
+        return defaultNodeContent();
     }
 
     private Button startButton() {
@@ -137,5 +152,21 @@ public class ProcessComponent extends AnchorPane {
                 });
 
         return removeButton;
+    }
+
+    /** 默认节点的主体 */
+    private Pane defaultNodeContent() {
+        double TEXT_AREA_WIDTH = 350;
+        double TEXT_AREA_HEIGHT = 200;
+
+        TextArea textArea = new TextArea();
+        textArea.setPrefWidth(TEXT_AREA_WIDTH);
+        textArea.setPrefHeight(TEXT_AREA_HEIGHT);
+        textArea.setMaxWidth(TEXT_AREA_WIDTH);
+
+        HBox hBox = new HBox();
+        hBox.setAlignment(Pos.TOP_CENTER);
+        hBox.getChildren().add(textArea);
+        return hBox;
     }
 }

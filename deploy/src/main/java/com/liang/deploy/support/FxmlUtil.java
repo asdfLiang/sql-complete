@@ -1,4 +1,4 @@
-package com.liang.deploy.controller;
+package com.liang.deploy.support;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.Pane;
