@@ -1,15 +1,17 @@
 package com.liang.deploy.components;
 
 import com.liang.deploy.action.AlertAction;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Line;
+
 import org.springframework.util.CollectionUtils;
 
 /**
@@ -33,7 +35,7 @@ public class ProcessComponent extends AnchorPane {
 
         // 结构定义
         Button startButton = startButton();
-        Node nodeContent = nodeContent();
+        Pane nodeContent = nodeContent();
         Button addButton = addButton(node);
         Line line1 = new Line(0, 0, 0, 30);
         Line line2 = new Line(0, 0, 0, 30);
@@ -52,7 +54,7 @@ public class ProcessComponent extends AnchorPane {
 
         // 结构定义
         Button removeButton = removeButton(parentNode, node);
-        Node nodeContent = nodeContent();
+        Pane nodeContent = nodeContent();
         Button addButton = addButton(node);
         Line line2 = new Line(0, 0, 0, 30);
         HBox next = new HBox();
@@ -65,7 +67,7 @@ public class ProcessComponent extends AnchorPane {
     }
 
     /** 节点的主体 */
-    private Node nodeContent() {
+    private Pane nodeContent() {
         double TEXT_AREA_WIDTH = 350;
         double TEXT_AREA_HEIGHT = 200;
 
@@ -74,7 +76,10 @@ public class ProcessComponent extends AnchorPane {
         textArea.setPrefHeight(TEXT_AREA_HEIGHT);
         textArea.setMaxWidth(TEXT_AREA_WIDTH);
 
-        return textArea;
+        HBox hBox = new HBox();
+        hBox.setAlignment(Pos.TOP_CENTER);
+        hBox.getChildren().add(textArea);
+        return hBox;
     }
 
     private Button startButton() {
