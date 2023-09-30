@@ -1,8 +1,8 @@
 package com.liang.deploy.controller;
 
-import com.liang.deploy.components.ProcessComponent;
-import com.liang.deploy.controller.converter.ConnectionVOConverter;
 import com.liang.deploy.controller.vo.ConnectionItemVO;
+import com.liang.deploy.controller.vo.converter.ConnectionVOConverter;
+import com.liang.deploy.support.FxmlUtil;
 import com.liang.deploy.view.ConnectionView;
 import com.liang.service.ConnectionService;
 import com.liang.service.support.dto.ColumnDTO;
@@ -55,7 +55,7 @@ public class PrimaryController {
     /** 打开新建流程窗口 */
     @FXML
     public void openNewProcessTab() {
-        ScrollPane scrollPane = new ScrollPane(new ProcessComponent());
+        ScrollPane scrollPane = new ScrollPane(FxmlUtil.load("/fxml/process-root.fxml"));
         Tab tab = new Tab("新建流程", scrollPane);
 
         processTabPane.getTabs().add(tab);
