@@ -1,6 +1,6 @@
 package com.liang.deploy;
 
-import com.liang.deploy.view.PrimaryView;
+import com.liang.deploy.view.MainView;
 
 import de.felixroske.jfxsupport.AbstractJavaFxApplicationSupport;
 
@@ -16,7 +16,7 @@ import org.springframework.context.annotation.ComponentScan;
 public class Application extends AbstractJavaFxApplicationSupport {
 
     public static void main(String[] args) {
-        launch(Application.class, PrimaryView.class, args);
+        launch(Application.class, MainView.class, args);
     }
 
     @Override

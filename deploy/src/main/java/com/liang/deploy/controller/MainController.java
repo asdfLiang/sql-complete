@@ -1,12 +1,15 @@
 package com.liang.deploy.controller;
 
-import com.liang.deploy.controller.vo.ConnectionItemVO;
-import com.liang.deploy.controller.vo.converter.ConnectionVOConverter;
-import com.liang.deploy.support.FxmlUtil;
+import com.liang.deploy.support.vo.ConnectionItemVO;
+import com.liang.deploy.support.vo.NodeData;
+import com.liang.deploy.support.vo.converter.ConnectionVOConverter;
 import com.liang.deploy.view.ConnectionView;
+import com.liang.deploy.view.ProcessView;
 import com.liang.service.ConnectionService;
+import com.liang.service.ProcessService;
 import com.liang.service.support.dto.ColumnDTO;
 import com.liang.service.support.dto.ConnectionDTO;
+import com.liang.service.support.dto.ProcessDTO;
 import com.liang.service.support.dto.TableDTO;
 import com.liang.service.support.events.ConnectionsChangeEvent;
 
@@ -14,6 +17,7 @@ import de.felixroske.jfxsupport.AbstractJavaFxApplicationSupport;
 import de.felixroske.jfxsupport.FXMLController;
 
 import javafx.fxml.FXML;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Modality;
@@ -30,19 +34,22 @@ import java.util.List;
  * @author by liangzj
  */
 @FXMLController
-public class PrimaryController {
+public class MainController {
     private final Stage rootStage = AbstractJavaFxApplicationSupport.getStage();
 
     @FXML private TreeView<ConnectionItemVO> connectionTree;
     @FXML private TabPane processTabPane;
 
     @Autowired private ConnectionView connectionView;
+    @Autowired private ProcessView processView;
+
     @Autowired private ConnectionService connectionService;
+    @Autowired private ProcessService processService;
 
     /** 打开新建连接窗口 */
     @FXML
     public void openNewConnectionView() {
-        Scene scene = new Scene(connectionView.getView());
+        Scene scene = connectionView.getView().getScene();
 
         Stage stage = new Stage();
         stage.setTitle("数据库连接");
@@ -55,10 +62,16 @@ public class PrimaryController {
     /** 打开新建流程窗口 */
     @FXML
     public void openNewProcessTab() {
-        ScrollPane scrollPane = new ScrollPane(FxmlUtil.load("/fxml/process-root.fxml"));
-        Tab tab = new Tab("新建流程", scrollPane);
-
+        Parent view = processView.getView();
+        Tab tab = new Tab("新建流程", new ScrollPane(view));
         processTabPane.getTabs().add(tab);
+
+        // 保存流程到数据库
+        ProcessDTO processDTO = processService.save(new ProcessDTO("新建流程"));
+        NodeData nodeData = new NodeData();
+        nodeData.setProcessId(processDTO.getProcessId());
+        nodeData.setNodeId(processDTO.getRoot().getNodeId());
+        view.setUserData(nodeData);
     }
 
     @FXML

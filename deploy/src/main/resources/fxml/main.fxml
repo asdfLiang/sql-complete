@@ -38,7 +38,7 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 <VBox xmlns:fx="http://javafx.com/fxml/1" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/20.0.1"
-      fx:controller="com.liang.deploy.controller.PrimaryController">
+      fx:controller="com.liang.deploy.controller.MainController">
     <MenuBar VBox.vgrow="NEVER">
         <Menu mnemonicParsing="false" text="文件">
             <MenuItem mnemonicParsing="false" onAction="#openNewConnectionView" text="新建"/>

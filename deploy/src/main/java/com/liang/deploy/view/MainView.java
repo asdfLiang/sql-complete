@@ -9,5 +9,5 @@ import de.felixroske.jfxsupport.FXMLView;
  * @since 2023/9/7 7:03
  * @author by liangzj
  */
-@FXMLView(value = "/fxml/primary.fxml")
-public class PrimaryView extends AbstractFxmlView {}
+@FXMLView(value = "/fxml/main.fxml")
+public class MainView extends AbstractFxmlView {}

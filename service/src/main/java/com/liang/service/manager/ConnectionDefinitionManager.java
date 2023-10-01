@@ -3,9 +3,10 @@ package com.liang.service.manager;
 import com.liang.dal.entity.ConnectionDefinitionDO;
 import com.liang.dal.mapper.ConnectionDefinitionMapper;
 import com.liang.service.support.constants.Constants;
-import com.liang.service.support.converter.ConnectionDTOConverter;
 import com.liang.service.support.dto.ConnectionDTO;
+import com.liang.service.support.dto.converter.ConnectionDTOConverter;
 import com.liang.service.support.events.ConnectionsChangeEvent;
+import com.liang.service.support.utils.UUIDUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,7 +20,6 @@ import org.springframework.util.CollectionUtils;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 /**
  * @since 2023/9/10 21:19
@@ -35,7 +35,7 @@ public class ConnectionDefinitionManager {
         // 保存
         ConnectionDefinitionDO connectionDO = new ConnectionDefinitionDO();
         BeanUtils.copyProperties(dto, connectionDO);
-        connectionDO.setConnectionId(UUID.randomUUID().toString().replace("-", ""));
+        connectionDO.setConnectionId(UUIDUtil.get());
         connectionDO.setSchemaName(getSchemaName(dto.getUrl()));
         Integer insert = connectionDefinitionMapper.insert(connectionDO);
 

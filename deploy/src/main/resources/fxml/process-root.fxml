@@ -6,19 +6,20 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Line?>
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity"
+            minHeight="-Infinity"
             minWidth="-Infinity" xmlns="http://javafx.com/javafx/20.0.1"
+            fx:id="processContext"
             fx:controller="com.liang.deploy.controller.ProcessController">
-
     <VBox fx:id="processRoot" alignment="TOP_CENTER" layoutY="30">
-        <Button text="开始流程"/>
+        <Button text="开始流程" onAction="#startProcess"/>
         <Line endY="30"/>
         <VBox alignment="TOP_CENTER">
             <TextArea prefWidth="350" prefHeight="200" maxWidth="350" maxHeight="200"/>
         </VBox>
         <Line endY="30"/>
         <Button prefWidth="25" prefHeight="25" text="+" onAction="#addSubNodeToRoot"/>
-        <HBox fx:id="firstSubNodes"/>
+        <HBox fx:id="rootSubNodes"/>
     </VBox>
 
 </AnchorPane>
