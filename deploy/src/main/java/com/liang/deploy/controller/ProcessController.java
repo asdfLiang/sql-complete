@@ -12,7 +12,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -27,7 +26,6 @@ import org.springframework.util.CollectionUtils;
  */
 @FXMLController
 public class ProcessController {
-    @FXML private AnchorPane processContext;
     @FXML private VBox processRoot;
     @FXML private HBox rootSubNodes;
 
@@ -35,13 +33,7 @@ public class ProcessController {
 
     @FXML
     public void initialize() {
-//        NodeData contextData = (NodeData) processContext.getUserData();
-//        processRoot.setUserData(
-//                new NodeData(contextData.getProcessId(), contextData.getNodeId(), rootSubNodes));
-        processRoot.setUserData(
-                new NodeData(null, null, rootSubNodes));
-
-        // TODO 查询数据库，构建流程
+        processRoot.setUserData(new NodeData(null, null, rootSubNodes));
     }
 
     @FXML

@@ -16,17 +16,22 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public ProcessDTO save(ProcessDTO dto) {
         System.out.println("保存了一个流程");
-        return new ProcessDTO();
+        ProcessDTO processDTO = new ProcessDTO();
+        processDTO.setProcessId("11111111111111");
+        processDTO.setRoot(new ProcessNodeDTO(processDTO.getProcessId(), null, "aaaaaaaaaaa"));
+        return processDTO;
     }
 
     @Override
     public ProcessNodeDTO saveNode(ProcessNodeDTO dto) {
         System.out.println("保存了一个流程节点");
+        System.out.println(dto);
         return new ProcessNodeDTO();
     }
 
     @Override
     public void deleteNode(String nodeId) {
+        System.out.println(nodeId);
         System.out.println("删除了一个流程节点");
     }
 

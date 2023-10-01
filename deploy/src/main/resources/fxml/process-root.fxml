@@ -9,7 +9,6 @@
 <AnchorPane xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity"
             minHeight="-Infinity"
             minWidth="-Infinity" xmlns="http://javafx.com/javafx/20.0.1"
-            fx:id="processContext"
             fx:controller="com.liang.deploy.controller.ProcessController">
     <VBox fx:id="processRoot" alignment="TOP_CENTER" layoutY="30">
         <Button text="开始流程" onAction="#startProcess"/>

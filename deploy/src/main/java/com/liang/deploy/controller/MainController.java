@@ -1,10 +1,9 @@
 package com.liang.deploy.controller;
 
+import com.liang.deploy.support.utils.SpringFXMLLoader;
 import com.liang.deploy.support.vo.ConnectionItemVO;
 import com.liang.deploy.support.vo.NodeData;
 import com.liang.deploy.support.vo.converter.ConnectionVOConverter;
-import com.liang.deploy.view.ConnectionView;
-import com.liang.deploy.view.ProcessView;
 import com.liang.service.ConnectionService;
 import com.liang.service.ProcessService;
 import com.liang.service.support.dto.ColumnDTO;
@@ -40,8 +39,7 @@ public class MainController {
     @FXML private TreeView<ConnectionItemVO> connectionTree;
     @FXML private TabPane processTabPane;
 
-    @Autowired private ConnectionView connectionView;
-    @Autowired private ProcessView processView;
+    @Autowired private SpringFXMLLoader springFXMLLoader;
 
     @Autowired private ConnectionService connectionService;
     @Autowired private ProcessService processService;
@@ -49,11 +47,11 @@ public class MainController {
     /** 打开新建连接窗口 */
     @FXML
     public void openNewConnectionView() {
-        Scene scene = connectionView.getView().getScene();
+        Parent view = springFXMLLoader.load("/fxml/create-connection.fxml");
 
         Stage stage = new Stage();
         stage.setTitle("数据库连接");
-        stage.setScene(scene);
+        stage.setScene(new Scene(view));
         stage.initOwner(rootStage);
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.show();
@@ -62,16 +60,16 @@ public class MainController {
     /** 打开新建流程窗口 */
     @FXML
     public void openNewProcessTab() {
-        Parent view = processView.getView();
+        Parent view = springFXMLLoader.load("/fxml/process-root.fxml");
         Tab tab = new Tab("新建流程", new ScrollPane(view));
         processTabPane.getTabs().add(tab);
 
-        // 保存流程到数据库
+        // 保存流程到数据库，并回填根节点信息
         ProcessDTO processDTO = processService.save(new ProcessDTO("新建流程"));
-        NodeData nodeData = new NodeData();
+        // 回填
+        NodeData nodeData = (NodeData) view.lookup("#processRoot").getUserData();
         nodeData.setProcessId(processDTO.getProcessId());
         nodeData.setNodeId(processDTO.getRoot().getNodeId());
-        view.setUserData(nodeData);
     }
 
     @FXML
