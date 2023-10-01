@@ -12,6 +12,7 @@ public class ProcessNodeDO {
 
     private String nodeId;
 
+
     private String nodeType;
 
     private String parentId;

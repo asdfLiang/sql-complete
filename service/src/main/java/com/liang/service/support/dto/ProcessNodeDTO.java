@@ -18,4 +18,6 @@ public class ProcessNodeDTO {
     private String parentId;
 
     private String nodeId;
+
+    private String nodeType;
 }

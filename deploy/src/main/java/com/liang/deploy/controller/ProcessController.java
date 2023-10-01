@@ -3,6 +3,7 @@ package com.liang.deploy.controller;
 import com.liang.deploy.action.AlertAction;
 import com.liang.deploy.support.vo.NodeData;
 import com.liang.service.ProcessService;
+import com.liang.service.support.constants.NodeType;
 import com.liang.service.support.dto.ProcessNodeDTO;
 
 import de.felixroske.jfxsupport.FXMLController;
@@ -55,7 +56,7 @@ public class ProcessController {
         VBox subNode = buildProcessNode(node);
         subNode.setPadding(new Insets(0, 15, 0, 15));
 
-        // 放到父节点下的集合中
+        // 放到节点下的子节点集合中
         NodeData nodeData = (NodeData) node.getUserData();
         HBox nodeSubHBox = nodeData.getSubNodeHBox();
         nodeSubHBox.getChildren().add(subNode);
@@ -64,10 +65,12 @@ public class ProcessController {
         nodeSubHBox.setStyle("-fx-border-color: black");
 
         // 保存子节点信息到数据库，回填节点信息
-        ProcessNodeDTO nodeDTO =
-                processService.saveNode(
-                        new ProcessNodeDTO(nodeData.getProcessId(), nodeData.getNodeId(), null));
-        //
+        ProcessNodeDTO dto = new ProcessNodeDTO();
+        dto.setProcessId(nodeData.getProcessId());
+        dto.setParentId(nodeData.getNodeId());
+        dto.setNodeType(NodeType.NORMAL.name());
+        ProcessNodeDTO nodeDTO = processService.saveNode(dto);
+        // 回填节点信息
         NodeData subNodeData = (NodeData) subNode.getUserData();
         subNodeData.setProcessId(nodeDTO.getProcessId());
         subNodeData.setNodeId(nodeDTO.getNodeId());
