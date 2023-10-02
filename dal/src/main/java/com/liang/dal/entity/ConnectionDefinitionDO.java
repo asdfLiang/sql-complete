@@ -2,6 +2,8 @@ package com.liang.dal.entity;
 
 import lombok.Data;
 
+import java.util.Date;
+
 /**
  * @since 2023/9/9 15:44
  * @author by liangzj
@@ -22,4 +24,8 @@ public class ConnectionDefinitionDO {
     private String username;
 
     private String password;
+
+    private Date createTime;
+
+    private Date modifyTime;
 }

@@ -16,8 +16,8 @@ public interface ProcessNodeMapper {
 
     @Insert({
         "<script>",
-        "INSERT INTO process_node(node_id, node_type, parent_id, process_id) ",
-        "VALUES (#{nodeId}, #{nodeType}, #{parentId}, #{processId})",
+        "INSERT INTO process_node(node_id, node_type, parent_id, process_id, create_time, modify_time) ",
+        "VALUES (#{nodeId}, #{nodeType}, #{parentId}, #{processId}, datetime(), datetime())",
         "</script>"
     })
     Integer insert(ProcessNodeDO processNodeDO);

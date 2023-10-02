@@ -18,8 +18,8 @@ public interface ConnectionDefinitionMapper {
 
     @Insert({
         "<script>",
-        "INSERT INTO connection_definition(connection_id, connection_name, url, schema_name, username, password) ",
-        "VALUES (#{connectionId}, #{connectionName}, #{url}, #{schemaName}, #{username}, #{password})",
+        "INSERT INTO connection_definition(connection_id, connection_name, url, schema_name, username, password, create_time, modify_time) ",
+        "VALUES (#{connectionId}, #{connectionName}, #{url}, #{schemaName}, #{username}, #{password}, datetime(), datetime())",
         "</script>"
     })
     Integer insert(ConnectionDefinitionDO connectionDO);

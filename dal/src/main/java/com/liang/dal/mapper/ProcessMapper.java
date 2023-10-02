@@ -18,7 +18,7 @@ public interface ProcessMapper {
 
     @Insert({
         "<script>",
-        "INSERT INTO process(process_id, process_name) VALUES (#{processId}, #{processName})",
+        "INSERT INTO process(process_id, process_name, create_time, modify_time) VALUES (#{processId}, #{processName}, datetime(), datetime())",
         "</script>"
     })
     Integer insert(ProcessDO processDO);

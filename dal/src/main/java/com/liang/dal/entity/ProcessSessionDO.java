@@ -5,19 +5,17 @@ import lombok.Data;
 import java.util.Date;
 
 /**
- * sql执行流程
- *
- * @since 2023/9/30 21:29
+ * @since 2023/10/2 8:33
  * @author by liangzj
  */
 @Data
-public class ProcessDO {
+public class ProcessSessionDO {
 
     private Long id;
 
-    private String processId;
+    private String sessionId;
 
-    private String processName;
+    private String processId;
 
     private Date createTime;
 

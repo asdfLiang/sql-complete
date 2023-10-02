@@ -2,6 +2,8 @@ package com.liang.dal.entity;
 
 import lombok.Data;
 
+import java.util.Date;
+
 /**
  * @since 2023/9/30 21:32
  * @author by liangzj
@@ -18,4 +20,8 @@ public class ProcessSqlDO {
     private String connectionId;
 
     private String sql;
+
+    private Date createTime;
+
+    private Date modifyTime;
 }
