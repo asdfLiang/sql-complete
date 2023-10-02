@@ -6,6 +6,7 @@ import com.liang.deploy.vo.NodeData;
 import com.liang.deploy.vo.converter.ConnectionVOConverter;
 import com.liang.service.ConnectionService;
 import com.liang.service.ProcessService;
+import com.liang.service.ProcessSessionService;
 import com.liang.service.support.dto.ColumnDTO;
 import com.liang.service.support.dto.ConnectionDTO;
 import com.liang.service.support.dto.ProcessDTO;
@@ -43,6 +44,7 @@ public class MainController {
 
     @Autowired private ConnectionService connectionService;
     @Autowired private ProcessService processService;
+    @Autowired private ProcessSessionService processSessionService;
 
     /** 打开新建连接窗口 */
     @FXML
@@ -70,10 +72,26 @@ public class MainController {
         NodeData nodeData = (NodeData) view.lookup("#processRoot").getUserData();
         nodeData.setProcessId(processDTO.getProcessId());
         nodeData.setNodeId(processDTO.getRoot().getNodeId());
+
+        // 创建会话，添加会话删除事件
+        String sessionId = processSessionService.openSession(processDTO.getProcessId());
+        tab.setOnClosed(event -> processSessionService.closeSession(sessionId));
     }
 
     @FXML
     public void initialize() {
+        initConnectionTree();
+
+        initProcessSession();
+    }
+
+    /** 初始化会话tab */
+    private void initProcessSession() {
+        // TODO 根据会话初始化tab
+    }
+
+    /** 初始化连接列表 */
+    private void initConnectionTree() {
         connectionTree.setRoot(new TreeItem<>(new ConnectionItemVO("", "所有连接", "")));
         // 设置展示文案为数据库名称
         connectionTree.setCellFactory(

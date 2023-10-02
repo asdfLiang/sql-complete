@@ -52,5 +52,19 @@ create index main.idx_process_id
 create unique index main.uni_node_id
     on main.process_node (node_id);
 
+-- 流程会话表
+create table main.process_session
+(
+    id          INTEGER not null
+        constraint pk_id
+            primary key autoincrement,
+    session_id  TEXT    not null,
+    process_id  TEXT    not null,
+    create_time REAL    not null,
+    modify_time REAL    not null
+);
+
+create index main.idx_process_id
+    on main.process_session (process_id);
 
 

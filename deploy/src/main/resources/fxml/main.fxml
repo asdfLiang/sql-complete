@@ -41,7 +41,10 @@
       fx:controller="com.liang.deploy.controller.MainController">
     <MenuBar VBox.vgrow="NEVER">
         <Menu mnemonicParsing="false" text="文件">
-            <MenuItem mnemonicParsing="false" onAction="#openNewConnectionView" text="新建"/>
+            <Menu text="新建">
+                <MenuItem mnemonicParsing="false" onAction="#openNewConnectionView" text="连接..."/>
+                <MenuItem mnemonicParsing="false" onAction="#openNewProcessTab" text="流程..."/>
+            </Menu>
             <MenuItem mnemonicParsing="false" text="打开…"/>
             <Menu mnemonicParsing="false" text="Open Recent"/>
             <SeparatorMenuItem mnemonicParsing="false"/>
@@ -85,10 +88,10 @@
             <TreeView fx:id="connectionTree" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
                       AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
         </AnchorPane>
-        <TabPane fx:id="processTabPane" prefHeight="552.0" prefWidth="443.0" tabClosingPolicy="UNAVAILABLE"
+        <TabPane fx:id="processTabPane" prefHeight="552.0" prefWidth="443.0"
                  AnchorPane.bottomAnchor="0.0"
                  AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-            <Tab text="首页">
+            <Tab text="首页" closable="false">
                 <AnchorPane
                         AnchorPane.bottomAnchor="0.0"
                         AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
