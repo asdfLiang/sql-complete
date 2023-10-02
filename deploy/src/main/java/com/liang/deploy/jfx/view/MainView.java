@@ -1,4 +1,4 @@
-package com.liang.deploy.view;
+package com.liang.deploy.jfx.view;
 
 import de.felixroske.jfxsupport.AbstractFxmlView;
 import de.felixroske.jfxsupport.FXMLView;

@@ -1,7 +1,7 @@
 package com.liang.deploy.controller;
 
-import com.liang.deploy.action.AlertAction;
-import com.liang.deploy.support.vo.NodeData;
+import com.liang.deploy.jfx.AlertAction;
+import com.liang.deploy.vo.NodeData;
 import com.liang.service.ProcessService;
 import com.liang.service.support.constants.NodeType;
 import com.liang.service.support.dto.ProcessNodeDTO;

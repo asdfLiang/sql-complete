@@ -1,4 +1,4 @@
-package com.liang.deploy.support.vo;
+package com.liang.deploy.vo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

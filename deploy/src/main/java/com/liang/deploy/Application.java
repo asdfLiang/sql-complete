@@ -1,6 +1,6 @@
 package com.liang.deploy;
 
-import com.liang.deploy.view.MainView;
+import com.liang.deploy.jfx.view.MainView;
 
 import de.felixroske.jfxsupport.AbstractJavaFxApplicationSupport;
 

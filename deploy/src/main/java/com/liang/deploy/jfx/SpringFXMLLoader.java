@@ -1,4 +1,4 @@
-package com.liang.deploy.support.utils;
+package com.liang.deploy.jfx;
 
 import com.liang.service.support.exceptions.BaseException;
 

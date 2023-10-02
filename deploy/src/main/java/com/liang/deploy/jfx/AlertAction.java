@@ -1,4 +1,4 @@
-package com.liang.deploy.action;
+package com.liang.deploy.jfx;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;

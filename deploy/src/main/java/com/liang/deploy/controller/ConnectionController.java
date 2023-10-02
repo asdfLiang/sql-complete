@@ -2,7 +2,7 @@ package com.liang.deploy.controller;
 
 import static com.liang.service.support.constants.Constants.JDBC_REGEX;
 
-import com.liang.deploy.action.AlertAction;
+import com.liang.deploy.jfx.AlertAction;
 import com.liang.service.ConnectionService;
 import com.liang.service.manager.ConnectionDefinitionManager;
 import com.liang.service.support.dto.ConnectionDTO;
