@@ -17,14 +17,19 @@ import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @since 2023/9/7 7:20
@@ -42,6 +47,7 @@ public class MainController {
     @Autowired private ConnectionService connectionService;
     @Autowired private ProcessService processService;
     @Autowired private ProcessSessionService processSessionService;
+    @Autowired private ApplicationEventPublisher applicationEventPublisher;
 
     /** 打开新建连接窗口 */
     @FXML
@@ -62,8 +68,11 @@ public class MainController {
         // 保存流程到数据库，并回填根节点信息
         ProcessDTO processDTO = processService.save(new ProcessDTO("新建流程"));
 
+        // 创建会话
+        String sessionId = processSessionService.openSession(processDTO.getProcessId());
+
         // 添加到流程到tab
-        add2Tab(processDTO);
+        processTabPane.getSelectionModel().select(addTab(sessionId, processDTO));
     }
 
     @FXML
@@ -81,11 +90,16 @@ public class MainController {
 
         // 查询流程
         List<String> processIds = sessions.stream().map(ProcessSessionDTO::getProcessId).toList();
-        List<ProcessDTO> list = processService.list(processIds);
-        if (CollectionUtils.isEmpty(list)) return;
+        Map<String, ProcessBaseDTO> processMap =
+                processService.list(processIds).stream()
+                        .collect(
+                                Collectors.toMap(
+                                        ProcessBaseDTO::getProcessId, Function.identity()));
+        if (CollectionUtils.isEmpty(processMap)) return;
 
         // 添加流程到tab
-        list.forEach(this::add2Tab);
+        sessions.forEach(
+                session -> addTab(session.getSessionId(), processMap.get(session.getProcessId())));
     }
 
     /** 初始化连接列表 */
@@ -134,22 +148,32 @@ public class MainController {
         }
     }
 
-    private void add2Tab(ProcessDTO processDTO) {
+    private Tab addTab(String sessionId, ProcessBaseDTO processDTO) {
+        // 加载流程布局
         Parent view = springFXMLLoader.load("/fxml/process-root.fxml");
         ScrollPane scrollPane = new ScrollPane(view);
         scrollPane.setStyle("-fx-background-color: green");
-        Tab tab = new Tab("新建流程", scrollPane);
 
-        processTabPane.getTabs().add(tab);
-
-        // 回填
-        NodeData nodeData = (NodeData) view.lookup("#processRoot").getUserData();
+        // 填充节点数据
+        VBox processRoot = (VBox) view.lookup("#processRoot");
+        NodeData nodeData = (NodeData) processRoot.getUserData();
         nodeData.setProcessId(processDTO.getProcessId());
         nodeData.setNodeId(processDTO.getRoot().getNodeId());
+        //
+        TextArea processSql = (TextArea) view.lookup("#processSql");
+        processSql.setText(processDTO.getRoot().getSql());
 
-        // 创建会话，添加会话删除事件
-        String sessionId = processSessionService.openSession(processDTO.getProcessId());
+        // 创建tab
+        Tab tab = new Tab(processDTO.getProcessName(), scrollPane);
+        tab.selectedProperty()
+                .addListener(
+                        (observable, oldValue, newValue) -> {
+                            if (newValue) applicationEventPublisher.publishEvent(processRoot);
+                        });
         tab.setOnClosed(event -> processSessionService.closeSession(sessionId));
+        processTabPane.getTabs().add(tab);
+
+        return tab;
     }
 
     private void expandConnectionItem(TreeItem<ConnectionItemVO> selectedItem) {

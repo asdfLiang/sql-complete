@@ -5,6 +5,7 @@ import com.liang.deploy.vo.NodeData;
 import com.liang.service.ProcessService;
 import com.liang.service.support.constants.NodeType;
 import com.liang.service.support.dto.ProcessNodeDTO;
+import com.liang.service.support.events.ProcessTabSelectedEvent;
 
 import de.felixroske.jfxsupport.FXMLController;
 
@@ -19,6 +20,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Line;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
 import org.springframework.util.CollectionUtils;
 
 /**
@@ -160,4 +162,10 @@ public class ProcessController {
         hBox.getChildren().add(textArea);
         return hBox;
     }
+
+    @EventListener(classes = {ProcessTabSelectedEvent.class})
+    private void buildProcessTree(VBox processRoot) {
+        NodeData userData = (NodeData) processRoot.getUserData();
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.liang.service;
 
+import com.liang.service.support.dto.ProcessBaseDTO;
 import com.liang.service.support.dto.ProcessDTO;
 import com.liang.service.support.dto.ProcessNodeDTO;
 
@@ -17,7 +18,7 @@ public interface ProcessService {
 
     void deleteNode(String nodeId);
 
-    List<ProcessDTO> list(List<String> processIds);
+    List<ProcessBaseDTO> list(List<String> processIds);
 
     void saveSql(String nodeId, String connectionId, String sql);
 }

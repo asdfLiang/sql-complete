@@ -20,4 +20,6 @@ public class ProcessNodeDTO {
     private String nodeId;
 
     private String nodeType;
+
+    private String sql;
 }

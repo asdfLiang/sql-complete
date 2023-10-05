@@ -6,6 +6,7 @@ import com.liang.dal.mapper.ProcessMapper;
 import com.liang.dal.mapper.ProcessNodeMapper;
 import com.liang.service.ProcessService;
 import com.liang.service.support.constants.NodeType;
+import com.liang.service.support.dto.ProcessBaseDTO;
 import com.liang.service.support.dto.ProcessDTO;
 import com.liang.service.support.dto.ProcessNodeDTO;
 import com.liang.service.support.dto.converter.ProcessDTOConverter;
@@ -19,6 +20,9 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @since 2023/9/30 23:39
@@ -76,24 +80,54 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     @Override
-    public List<ProcessDTO> list(List<String> processIds) {
-        List<ProcessDO> list = processMapper.selectBatch(processIds);
-        if (CollectionUtils.isEmpty(list)) {
-            return Collections.emptyList();
-        }
+    public List<ProcessBaseDTO> list(List<String> processIds) {
+        List<ProcessBaseDTO> processList = listProcess(processIds);
+        if (CollectionUtils.isEmpty(processList)) return Collections.emptyList();
 
-        return list.stream()
-                .map(
-                        processDO -> {
-                            ProcessDTO dto = new ProcessDTO();
-                            BeanUtils.copyProperties(processDO, dto);
-                            return dto;
-                        })
+        Map<String, ProcessNodeDTO> processRootMap = getProcessRootMap(processIds);
+
+        return processList.stream()
+                .filter(process -> Objects.nonNull(processRootMap.get(process.getProcessId())))
+                .peek(process -> process.setRoot(processRootMap.get(process.getProcessId())))
                 .toList();
     }
 
     @Override
     public void saveSql(String nodeId, String connectionId, String sql) {
         System.out.println("保存了sql");
+    }
+
+    private List<ProcessBaseDTO> listProcess(List<String> processIds) {
+        List<ProcessDO> processes = processMapper.selectBatch(processIds);
+        if (CollectionUtils.isEmpty(processes)) return Collections.emptyList();
+
+        return processes.stream()
+                .map(
+                        processDO -> {
+                            ProcessBaseDTO dto = new ProcessBaseDTO();
+                            BeanUtils.copyProperties(processDO, dto);
+                            return dto;
+                        })
+                .toList();
+    }
+
+    /**
+     * 获取根节点map
+     *
+     * @return Map<processId, rootDTO>
+     */
+    private Map<String, ProcessNodeDTO> getProcessRootMap(List<String> processIds) {
+        List<ProcessNodeDO> rootList = processNodeMapper.selectRoot(processIds);
+        if (CollectionUtils.isEmpty(rootList)) return Collections.emptyMap();
+
+        return rootList.stream()
+                .collect(
+                        Collectors.toMap(
+                                ProcessNodeDO::getProcessId,
+                                nodeDO -> {
+                                    ProcessNodeDTO dto = new ProcessNodeDTO();
+                                    BeanUtils.copyProperties(nodeDO, dto);
+                                    return dto;
+                                }));
     }
 }
