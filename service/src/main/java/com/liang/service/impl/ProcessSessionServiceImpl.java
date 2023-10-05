@@ -3,6 +3,7 @@ package com.liang.service.impl;
 import com.liang.dal.entity.ProcessSessionDO;
 import com.liang.dal.mapper.ProcessSessionMapper;
 import com.liang.service.ProcessSessionService;
+import com.liang.service.support.dto.ProcessSessionDTO;
 import com.liang.service.support.exceptions.BaseException;
 import com.liang.service.support.utils.UUIDUtil;
 
@@ -11,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -41,5 +43,10 @@ public class ProcessSessionServiceImpl implements ProcessSessionService {
     public void closeSession(String sessionId) {
         Integer number = processSessionMapper.delete(sessionId);
         log.info("关闭会话: {}, sessionId: {}", number, sessionId);
+    }
+
+    @Override
+    public List<ProcessSessionDTO> list() {
+        return null;
     }
 }

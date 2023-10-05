@@ -15,8 +15,10 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Collections;
+import java.util.List;
 
 /**
  * @since 2023/9/30 23:39
@@ -71,6 +73,23 @@ public class ProcessServiceImpl implements ProcessService {
     public void deleteNode(String nodeId) {
         processNodeMapper.delete(nodeId);
         System.out.println("删除流程节点: " + nodeId);
+    }
+
+    @Override
+    public List<ProcessDTO> list(List<String> processIds) {
+        List<ProcessDO> list = processMapper.selectBatch(processIds);
+        if (CollectionUtils.isEmpty(list)) {
+            return Collections.emptyList();
+        }
+
+        return list.stream()
+                .map(
+                        processDO -> {
+                            ProcessDTO dto = new ProcessDTO();
+                            BeanUtils.copyProperties(processDO, dto);
+                            return dto;
+                        })
+                .toList();
     }
 
     @Override

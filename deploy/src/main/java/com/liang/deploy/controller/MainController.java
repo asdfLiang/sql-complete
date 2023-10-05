@@ -7,10 +7,7 @@ import com.liang.deploy.vo.converter.ConnectionVOConverter;
 import com.liang.service.ConnectionService;
 import com.liang.service.ProcessService;
 import com.liang.service.ProcessSessionService;
-import com.liang.service.support.dto.ColumnDTO;
-import com.liang.service.support.dto.ConnectionDTO;
-import com.liang.service.support.dto.ProcessDTO;
-import com.liang.service.support.dto.TableDTO;
+import com.liang.service.support.dto.*;
 import com.liang.service.support.events.ConnectionsChangeEvent;
 
 import de.felixroske.jfxsupport.AbstractJavaFxApplicationSupport;
@@ -62,32 +59,33 @@ public class MainController {
     /** 打开新建流程窗口 */
     @FXML
     public void openNewProcessTab() {
-        Parent view = springFXMLLoader.load("/fxml/process-root.fxml");
-        Tab tab = new Tab("新建流程", new ScrollPane(view));
-        processTabPane.getTabs().add(tab);
-
         // 保存流程到数据库，并回填根节点信息
         ProcessDTO processDTO = processService.save(new ProcessDTO("新建流程"));
-        // 回填
-        NodeData nodeData = (NodeData) view.lookup("#processRoot").getUserData();
-        nodeData.setProcessId(processDTO.getProcessId());
-        nodeData.setNodeId(processDTO.getRoot().getNodeId());
 
-        // 创建会话，添加会话删除事件
-        String sessionId = processSessionService.openSession(processDTO.getProcessId());
-        tab.setOnClosed(event -> processSessionService.closeSession(sessionId));
+        // 添加到流程到tab
+        add2Tab(processDTO);
     }
 
     @FXML
     public void initialize() {
         initConnectionTree();
 
-        initProcessSession();
+        initProcessTab();
     }
 
-    /** 初始化会话tab */
-    private void initProcessSession() {
-        // TODO 根据会话初始化tab
+    /** 初始化tab */
+    private void initProcessTab() {
+        // 查询未关闭会话
+        List<ProcessSessionDTO> sessions = processSessionService.list();
+        if (CollectionUtils.isEmpty(sessions)) return;
+
+        // 查询流程
+        List<String> processIds = sessions.stream().map(ProcessSessionDTO::getProcessId).toList();
+        List<ProcessDTO> list = processService.list(processIds);
+        if (CollectionUtils.isEmpty(list)) return;
+
+        // 添加流程到tab
+        list.forEach(this::add2Tab);
     }
 
     /** 初始化连接列表 */
@@ -134,6 +132,24 @@ public class MainController {
             TreeItem<ConnectionItemVO> item = new TreeItem<>(itemVO);
             root.getChildren().add(item);
         }
+    }
+
+    private void add2Tab(ProcessDTO processDTO) {
+        Parent view = springFXMLLoader.load("/fxml/process-root.fxml");
+        ScrollPane scrollPane = new ScrollPane(view);
+        scrollPane.setStyle("-fx-background-color: green");
+        Tab tab = new Tab("新建流程", scrollPane);
+
+        processTabPane.getTabs().add(tab);
+
+        // 回填
+        NodeData nodeData = (NodeData) view.lookup("#processRoot").getUserData();
+        nodeData.setProcessId(processDTO.getProcessId());
+        nodeData.setNodeId(processDTO.getRoot().getNodeId());
+
+        // 创建会话，添加会话删除事件
+        String sessionId = processSessionService.openSession(processDTO.getProcessId());
+        tab.setOnClosed(event -> processSessionService.closeSession(sessionId));
     }
 
     private void expandConnectionItem(TreeItem<ConnectionItemVO> selectedItem) {

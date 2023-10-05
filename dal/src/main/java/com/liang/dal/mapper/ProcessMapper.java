@@ -28,4 +28,12 @@ public interface ProcessMapper {
 
     @Select({"SELECT * FROM process WHERE process_id = #{processId}"})
     ProcessDO selectOne(@Param("processId") String processId);
+
+    @Select({
+        "<script>",
+        " SELECT * FROM process_node ",
+        " WHERE process_id <foreach collection='processIds' item='processId' open='(' separator=',' close=')'> #{processId} </foreach>",
+        "</script>"
+    })
+    List<ProcessDO> selectBatch(@Param("processIds") List<String> processIds);
 }
