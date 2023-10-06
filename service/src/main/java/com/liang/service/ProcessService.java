@@ -18,6 +18,8 @@ public interface ProcessService {
 
     void deleteNode(String nodeId);
 
+    ProcessDTO get(String processId);
+
     List<ProcessBaseDTO> list(List<String> processIds);
 
     void saveSql(String nodeId, String connectionId, String sql);

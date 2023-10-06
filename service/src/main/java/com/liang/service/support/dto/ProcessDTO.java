@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,7 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 public class ProcessDTO extends ProcessBaseDTO {
 
-    private List<ProcessNodeDTO> nodes;
+    private List<ProcessNodeDTO> nodes = new ArrayList<>();
 
     public ProcessDTO(String processName) {
         super(processName);

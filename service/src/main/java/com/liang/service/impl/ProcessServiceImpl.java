@@ -18,10 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -77,6 +74,25 @@ public class ProcessServiceImpl implements ProcessService {
     public void deleteNode(String nodeId) {
         processNodeMapper.delete(nodeId);
         System.out.println("删除流程节点: " + nodeId);
+    }
+
+    @Override
+    public ProcessDTO get(String processId) {
+        ProcessDO processDO = processMapper.selectOne(processId);
+        if (Objects.isNull(processDO)) return null;
+        ProcessDTO dto = new ProcessDTO();
+        BeanUtils.copyProperties(processDO, dto);
+
+        List<ProcessNodeDO> nodeDOList = processNodeMapper.select(processId);
+        if (CollectionUtils.isEmpty(nodeDOList)) return dto;
+        for (ProcessNodeDO nodeDO : nodeDOList) {
+            ProcessNodeDTO nodeDTO = new ProcessNodeDTO();
+            BeanUtils.copyProperties(nodeDO, nodeDTO);
+            if (NodeType.ROOT.name().equals(nodeDTO.getNodeType())) dto.setRoot(nodeDTO);
+            dto.getNodes().add(nodeDTO);
+        }
+
+        return dto;
     }
 
     @Override

@@ -33,4 +33,7 @@ public interface ProcessNodeMapper {
         "</script>"
     })
     List<ProcessNodeDO> selectRoot(@Param("processIds") List<String> processIds);
+
+    @Select({"SELECT * FROM process_node  WHERE process_id = #{processId}"})
+    List<ProcessNodeDO> select(@Param("processId") String processId);
 }

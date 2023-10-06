@@ -9,6 +9,7 @@ import com.liang.service.ProcessService;
 import com.liang.service.ProcessSessionService;
 import com.liang.service.support.dto.*;
 import com.liang.service.support.events.ConnectionsChangeEvent;
+import com.liang.service.support.events.ProcessTabSelectedEvent;
 
 import de.felixroske.jfxsupport.AbstractJavaFxApplicationSupport;
 import de.felixroske.jfxsupport.FXMLController;
@@ -188,7 +189,7 @@ public class MainController {
     private ChangeListener<Boolean> handleTabSelectedEvent(VBox processRoot, Tab tab) {
         return (observable, oldValue, newValue) -> {
             if (newValue) {
-                applicationEventPublisher.publishEvent(processRoot);
+                applicationEventPublisher.publishEvent(new ProcessTabSelectedEvent(processRoot));
                 sessionContext.switchTab(tab);
             }
         };

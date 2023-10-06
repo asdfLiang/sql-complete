@@ -4,7 +4,9 @@ import com.liang.deploy.jfx.AlertAction;
 import com.liang.deploy.vo.NodeData;
 import com.liang.service.ProcessService;
 import com.liang.service.support.constants.NodeType;
+import com.liang.service.support.dto.ProcessDTO;
 import com.liang.service.support.dto.ProcessNodeDTO;
+import com.liang.service.support.events.ProcessTabSelectedEvent;
 
 import de.felixroske.jfxsupport.FXMLController;
 
@@ -18,8 +20,15 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Line;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
 import org.springframework.util.CollectionUtils;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @since 2023/9/24 22:59
@@ -72,7 +81,7 @@ public class ProcessController {
      *
      * @param node 要添加子节点的节点
      */
-    private void addSubNode(VBox node, ProcessNodeDTO subNodeDTO) {
+    private VBox addSubNode(VBox node, ProcessNodeDTO subNodeDTO) {
         VBox subNode = buildProcessNode(node);
         subNode.setPadding(new Insets(0, 15, 0, 15));
 
@@ -88,6 +97,8 @@ public class ProcessController {
         NodeData subNodeData = (NodeData) subNode.getUserData();
         subNodeData.setProcessId(subNodeDTO.getProcessId());
         subNodeData.setNodeId(subNodeDTO.getNodeId());
+
+        return subNode;
     }
 
     /** 删除子节点 */
@@ -175,8 +186,38 @@ public class ProcessController {
         return hBox;
     }
 
-    //    @EventListener(classes = {ProcessTabSelectedEvent.class})
-    //    private void buildProcessTree(VBox processRoot) {
-    //        NodeData userData = (NodeData) processRoot.getUserData();
-    //    }
+    @EventListener(classes = {ProcessTabSelectedEvent.class})
+    private void buildProcessTree(ProcessTabSelectedEvent selectedEvent) {
+        VBox rootNode = (VBox) selectedEvent.getSource();
+        NodeData nodeData = (NodeData) rootNode.getUserData();
+        if (!CollectionUtils.isEmpty(nodeData.getSubNodeHBox().getChildren())) return;
+
+        buildProcessTree(rootNode);
+    }
+
+    private void buildProcessTree(VBox rootNode) {
+        NodeData userData = (NodeData) rootNode.getUserData();
+        ProcessDTO processDTO = processService.get(userData.getProcessId());
+        if (Objects.isNull(processDTO) || CollectionUtils.isEmpty(processDTO.getNodes())) return;
+
+        // Map<parentId, List<SubNodeDTO>>
+        Map<String, List<ProcessNodeDTO>> subNodeDataMap =
+                processDTO.getNodes().stream()
+                        .filter(dto -> StringUtils.isNotBlank(dto.getParentId()))
+                        .collect(Collectors.groupingBy(ProcessNodeDTO::getParentId));
+        if (CollectionUtils.isEmpty(subNodeDataMap)) return;
+
+        buildProcessTree(rootNode, subNodeDataMap);
+    }
+
+    private void buildProcessTree(VBox node, Map<String, List<ProcessNodeDTO>> subNodeDataMap) {
+        NodeData nodeData = (NodeData) node.getUserData();
+        List<ProcessNodeDTO> subNodeDatas = subNodeDataMap.get(nodeData.getNodeId());
+        if (CollectionUtils.isEmpty(subNodeDatas)) return;
+
+        for (ProcessNodeDTO subNodeData : subNodeDatas) {
+            VBox subNode = addSubNode(node, subNodeData);
+            buildProcessTree(subNode, subNodeDataMap);
+        }
+    }
 }
