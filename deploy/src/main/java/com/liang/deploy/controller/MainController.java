@@ -13,6 +13,7 @@ import com.liang.service.support.events.ConnectionsChangeEvent;
 import de.felixroske.jfxsupport.AbstractJavaFxApplicationSupport;
 import de.felixroske.jfxsupport.FXMLController;
 
+import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -47,6 +48,7 @@ public class MainController {
     @Autowired private ConnectionService connectionService;
     @Autowired private ProcessService processService;
     @Autowired private ProcessSessionService processSessionService;
+    @Autowired private SessionContext sessionContext;
     @Autowired private ApplicationEventPublisher applicationEventPublisher;
 
     /** 打开新建连接窗口 */
@@ -65,14 +67,18 @@ public class MainController {
     /** 打开新建流程窗口 */
     @FXML
     public void openNewProcessTab() {
+        int size = processTabPane.getTabs().size();
+        System.out.println(size);
         // 保存流程到数据库，并回填根节点信息
-        ProcessDTO processDTO = processService.save(new ProcessDTO("新建流程"));
+        ProcessDTO processDTO = processService.save(new ProcessDTO("新建流程" + size));
 
         // 创建会话
         String sessionId = processSessionService.openSession(processDTO.getProcessId());
 
         // 添加到流程到tab
-        processTabPane.getSelectionModel().select(addTab(sessionId, processDTO));
+        Tab tab = addTab(sessionId, processDTO);
+        processTabPane.getSelectionModel().select(tab);
+        sessionContext.switchTab(tab);
     }
 
     @FXML
@@ -165,15 +171,27 @@ public class MainController {
 
         // 创建tab
         Tab tab = new Tab(processDTO.getProcessName(), scrollPane);
-        tab.selectedProperty()
-                .addListener(
-                        (observable, oldValue, newValue) -> {
-                            if (newValue) applicationEventPublisher.publishEvent(processRoot);
-                        });
-        tab.setOnClosed(event -> processSessionService.closeSession(sessionId));
+        tab.selectedProperty().addListener(handleTabSelectedEvent(processRoot, tab));
+        tab.setOnClosed(event -> handleTabClosedEvent(sessionId, tab));
+
         processTabPane.getTabs().add(tab);
+        sessionContext.putTabRoot(tab, processRoot);
 
         return tab;
+    }
+
+    private void handleTabClosedEvent(String sessionId, Tab tab) {
+        processSessionService.closeSession(sessionId);
+        sessionContext.removeTab(tab);
+    }
+
+    private ChangeListener<Boolean> handleTabSelectedEvent(VBox processRoot, Tab tab) {
+        return (observable, oldValue, newValue) -> {
+            if (newValue) {
+                applicationEventPublisher.publishEvent(processRoot);
+                sessionContext.switchTab(tab);
+            }
+        };
     }
 
     private void expandConnectionItem(TreeItem<ConnectionItemVO> selectedItem) {

@@ -5,7 +5,6 @@ import com.liang.deploy.vo.NodeData;
 import com.liang.service.ProcessService;
 import com.liang.service.support.constants.NodeType;
 import com.liang.service.support.dto.ProcessNodeDTO;
-import com.liang.service.support.events.ProcessTabSelectedEvent;
 
 import de.felixroske.jfxsupport.FXMLController;
 
@@ -20,7 +19,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Line;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.event.EventListener;
 import org.springframework.util.CollectionUtils;
 
 /**
@@ -33,6 +31,7 @@ public class ProcessController {
     @FXML private HBox rootSubNodes;
 
     @Autowired private ProcessService processService;
+    @Autowired private SessionContext sessionContext;
 
     @FXML
     public void initialize() {
@@ -41,7 +40,7 @@ public class ProcessController {
 
     @FXML
     public void addSubNodeToRoot() {
-        addSubNode(processRoot);
+        createSubNode(sessionContext.getSelectedRoot());
     }
 
     @FXML
@@ -50,11 +49,30 @@ public class ProcessController {
     }
 
     /**
+     * 为当前节点创建子节点
+     *
+     * @param node 当前节点
+     */
+    private void createSubNode(VBox node) {
+        NodeData nodeData = (NodeData) node.getUserData();
+
+        // 保存子节点信息到数据库，回填节点信息
+        ProcessNodeDTO dto = new ProcessNodeDTO();
+        dto.setProcessId(nodeData.getProcessId());
+        dto.setParentId(nodeData.getNodeId());
+        dto.setNodeType(NodeType.NORMAL.name());
+        ProcessNodeDTO subNodeDTO = processService.saveNode(dto);
+
+        // 添加子节点
+        addSubNode(node, subNodeDTO);
+    }
+
+    /**
      * 添加子节点
      *
      * @param node 要添加子节点的节点
      */
-    private void addSubNode(VBox node) {
+    private void addSubNode(VBox node, ProcessNodeDTO subNodeDTO) {
         VBox subNode = buildProcessNode(node);
         subNode.setPadding(new Insets(0, 15, 0, 15));
 
@@ -66,16 +84,10 @@ public class ProcessController {
         // 边框着色...连线太难了，先整个看的懂的效果
         nodeSubHBox.setStyle("-fx-border-color: black");
 
-        // 保存子节点信息到数据库，回填节点信息
-        ProcessNodeDTO dto = new ProcessNodeDTO();
-        dto.setProcessId(nodeData.getProcessId());
-        dto.setParentId(nodeData.getNodeId());
-        dto.setNodeType(NodeType.NORMAL.name());
-        ProcessNodeDTO nodeDTO = processService.saveNode(dto);
         // 回填节点信息
         NodeData subNodeData = (NodeData) subNode.getUserData();
-        subNodeData.setProcessId(nodeDTO.getProcessId());
-        subNodeData.setNodeId(nodeDTO.getNodeId());
+        subNodeData.setProcessId(subNodeDTO.getProcessId());
+        subNodeData.setNodeId(subNodeDTO.getNodeId());
     }
 
     /** 删除子节点 */
@@ -126,7 +138,7 @@ public class ProcessController {
         additionButton.setPrefWidth(25);
         additionButton.setPrefHeight(25);
 
-        additionButton.setOnAction(event -> addSubNode(node));
+        additionButton.setOnAction(event -> createSubNode(node));
         return additionButton;
     }
 
@@ -163,9 +175,8 @@ public class ProcessController {
         return hBox;
     }
 
-    @EventListener(classes = {ProcessTabSelectedEvent.class})
-    private void buildProcessTree(VBox processRoot) {
-        NodeData userData = (NodeData) processRoot.getUserData();
-    }
-
+    //    @EventListener(classes = {ProcessTabSelectedEvent.class})
+    //    private void buildProcessTree(VBox processRoot) {
+    //        NodeData userData = (NodeData) processRoot.getUserData();
+    //    }
 }
