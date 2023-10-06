@@ -1,5 +1,6 @@
 package com.liang.deploy.controller;
 
+import com.liang.deploy.controller.handler.ProcessEventHandler;
 import com.liang.deploy.jfx.SpringFXMLLoader;
 import com.liang.deploy.vo.ConnectionItemVO;
 import com.liang.deploy.vo.NodeData;
@@ -23,6 +24,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
@@ -30,6 +33,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -49,7 +53,9 @@ public class MainController {
     @Autowired private ConnectionService connectionService;
     @Autowired private ProcessService processService;
     @Autowired private ProcessSessionService processSessionService;
+
     @Autowired private SessionContext sessionContext;
+    @Autowired private ProcessEventHandler processEventHandler;
     @Autowired private ApplicationEventPublisher applicationEventPublisher;
 
     /** 打开新建连接窗口 */
@@ -164,13 +170,7 @@ public class MainController {
         scrollPane.setStyle("-fx-background-color: green");
 
         // 填充节点数据
-        VBox processRoot = (VBox) view.lookup("#processRoot");
-        NodeData nodeData = (NodeData) processRoot.getUserData();
-        nodeData.setProcessId(processDTO.getProcessId());
-        nodeData.setNodeId(processDTO.getRoot().getNodeId());
-        //
-        TextArea processSql = (TextArea) view.lookup("#processSql");
-        processSql.setText(processDTO.getRoot().getSql());
+        VBox processRoot = populateRootData(processDTO, view);
 
         // 创建tab
         Tab tab = new Tab(processDTO.getProcessName(), scrollPane);
@@ -181,6 +181,48 @@ public class MainController {
         sessionContext.putTabRoot(tab, processRoot);
 
         return tab;
+    }
+
+    private VBox populateRootData(ProcessBaseDTO processDTO, Parent view) {
+        VBox processRoot = (VBox) view.lookup("#processRoot");
+        NodeData nodeData = (NodeData) processRoot.getUserData();
+        nodeData.setProcessId(processDTO.getProcessId());
+        nodeData.setNodeId(processDTO.getRoot().getNodeId());
+        //
+        ChoiceBox<ConnectionDTO> choiceBox =
+                (ChoiceBox<ConnectionDTO>) processRoot.lookup("#connectionChoice");
+        selectConnection(choiceBox, processDTO.getRoot());
+
+        //
+        TextArea sqlTextArea = (TextArea) view.lookup("#sqlTextArea");
+        sqlTextArea.setText(processDTO.getRoot().getSql());
+        ProcessSqlDTO sqlDTO = new ProcessSqlDTO();
+        BeanUtils.copyProperties(nodeData, sqlDTO);
+        sqlTextArea
+                .focusedProperty()
+                .addListener(
+                        processEventHandler.saveSqlEventHandler(sqlTextArea, choiceBox, sqlDTO));
+        choiceBox
+                .focusedProperty()
+                .addListener(
+                        processEventHandler.saveSqlEventHandler(sqlTextArea, choiceBox, sqlDTO));
+        return processRoot;
+    }
+
+    private void selectConnection(ChoiceBox<ConnectionDTO> choiceBox, ProcessNodeDTO root) {
+        String connectionId = root.getConnectionId();
+        if (StringUtils.isNotBlank(connectionId)) {
+            ConnectionDTO connectionDTO =
+                    choiceBox.getItems().stream()
+                            .filter(elm -> StringUtils.equals(elm.getConnectionId(), connectionId))
+                            .findFirst()
+                            .orElse(null);
+            //
+            if (Objects.nonNull(connectionDTO)) choiceBox.getSelectionModel().select(connectionDTO);
+            else choiceBox.getSelectionModel().select(0);
+        } else {
+            choiceBox.getSelectionModel().select(0);
+        }
     }
 
     private void handleTabClosedEvent(String sessionId, Tab tab) {

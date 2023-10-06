@@ -3,6 +3,7 @@ package com.liang.service;
 import com.liang.service.support.dto.ProcessBaseDTO;
 import com.liang.service.support.dto.ProcessDTO;
 import com.liang.service.support.dto.ProcessNodeDTO;
+import com.liang.service.support.dto.ProcessSqlDTO;
 
 import java.util.List;
 
@@ -22,5 +23,5 @@ public interface ProcessService {
 
     List<ProcessBaseDTO> list(List<String> processIds);
 
-    void saveSql(String nodeId, String connectionId, String sql);
+    void saveNodeSql(ProcessSqlDTO dto);
 }

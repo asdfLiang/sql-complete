@@ -1,12 +1,14 @@
 package com.liang.deploy.controller;
 
 import com.liang.deploy.jfx.AlertAction;
+import com.liang.deploy.controller.handler.ProcessEventHandler;
 import com.liang.deploy.vo.NodeData;
 import com.liang.service.ProcessService;
 import com.liang.service.support.constants.NodeType;
 import com.liang.service.support.dto.ConnectionDTO;
 import com.liang.service.support.dto.ProcessDTO;
 import com.liang.service.support.dto.ProcessNodeDTO;
+import com.liang.service.support.dto.ProcessSqlDTO;
 import com.liang.service.support.events.ProcessTabSelectedEvent;
 
 import de.felixroske.jfxsupport.FXMLController;
@@ -24,6 +26,7 @@ import javafx.scene.shape.Line;
 import javafx.util.StringConverter;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.util.CollectionUtils;
@@ -45,6 +48,7 @@ public class ProcessController {
 
     @Autowired private ProcessService processService;
     @Autowired private SessionContext sessionContext;
+    @Autowired private ProcessEventHandler processEventHandler;
 
     @FXML
     public void initialize() {
@@ -90,7 +94,7 @@ public class ProcessController {
      * @param node 要添加子节点的节点
      */
     private VBox addSubNode(VBox node, ProcessNodeDTO subNodeDTO) {
-        VBox subNode = buildProcessNode(node);
+        VBox subNode = buildProcessNode(node, subNodeDTO);
         subNode.setPadding(new Insets(0, 15, 0, 15));
 
         // 放到节点下的子节点集合中
@@ -128,13 +132,13 @@ public class ProcessController {
     }
 
     /** 流程节点 */
-    private VBox buildProcessNode(VBox parentNode) {
+    private VBox buildProcessNode(VBox parentNode, ProcessNodeDTO subNodeDTO) {
         VBox node = new VBox();
         node.setAlignment(Pos.TOP_CENTER);
 
         // 结构定义
         Button removeButton = buildRemoveButton(parentNode, node);
-        Pane nodeContent = buildNodeContent();
+        Pane nodeContent = buildNodeContent(subNodeDTO);
         Button addButton = buildAddButton(node);
         Line line2 = new Line(0, 0, 0, 30);
         HBox next = new HBox();
@@ -179,28 +183,41 @@ public class ProcessController {
     }
 
     /** 节点的主体 */
-    private Pane buildNodeContent() {
+    private Pane buildNodeContent(ProcessNodeDTO subNodeDTO) {
         double TEXT_AREA_WIDTH = 350;
         double TEXT_AREA_HEIGHT = 200;
+
+        VBox vBox = new VBox();
+        vBox.setAlignment(Pos.TOP_CENTER);
 
         ChoiceBox<ConnectionDTO> choiceBox = new ChoiceBox<>();
         choiceBox.setPrefWidth(TEXT_AREA_WIDTH);
         choiceBox.setMaxWidth(TEXT_AREA_WIDTH);
         initConnectionChoice(choiceBox);
 
-        TextArea textArea = new TextArea();
-        textArea.setPrefWidth(TEXT_AREA_WIDTH);
-        textArea.setPrefHeight(TEXT_AREA_HEIGHT);
-        textArea.setMaxWidth(TEXT_AREA_WIDTH);
+        TextArea sqlTextArea = new TextArea();
+        sqlTextArea.setPrefWidth(TEXT_AREA_WIDTH);
+        sqlTextArea.setPrefHeight(TEXT_AREA_HEIGHT);
+        sqlTextArea.setMaxWidth(TEXT_AREA_WIDTH);
 
-        VBox vBox = new VBox();
-        vBox.setAlignment(Pos.TOP_CENTER);
-        vBox.getChildren().addAll(choiceBox, textArea);
+        ProcessSqlDTO sqlDTO = new ProcessSqlDTO();
+        BeanUtils.copyProperties(subNodeDTO, sqlDTO);
+        sqlTextArea
+                .focusedProperty()
+                .addListener(
+                        processEventHandler.saveSqlEventHandler(sqlTextArea, choiceBox, sqlDTO));
+        choiceBox
+                .focusedProperty()
+                .addListener(
+                        processEventHandler.saveSqlEventHandler(sqlTextArea, choiceBox, sqlDTO));
+
+        vBox.getChildren().addAll(choiceBox, sqlTextArea);
         return vBox;
     }
 
     private void initConnectionChoice(ChoiceBox<ConnectionDTO> connectionChoice) {
         connectionChoice.setItems(sessionContext.getConnectionList());
+        connectionChoice.getSelectionModel().select(0);
 
         connectionChoice.setConverter(
                 new StringConverter<>() {

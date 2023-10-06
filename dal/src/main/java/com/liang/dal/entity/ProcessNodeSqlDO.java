@@ -9,17 +9,17 @@ import java.util.Date;
  * @author by liangzj
  */
 @Data
-public class ProcessSqlDO {
+public class ProcessNodeSqlDO {
 
     private Long id;
 
     private String processId;
 
-    private String processNodeId;
+    private String nodeId;
 
     private String connectionId;
 
-    private String sql;
+    private String sqlText;
 
     private Date createTime;
 

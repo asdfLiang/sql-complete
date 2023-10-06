@@ -2,13 +2,16 @@ package com.liang.service.impl;
 
 import com.liang.dal.entity.ProcessDO;
 import com.liang.dal.entity.ProcessNodeDO;
+import com.liang.dal.entity.ProcessNodeSqlDO;
 import com.liang.dal.mapper.ProcessMapper;
 import com.liang.dal.mapper.ProcessNodeMapper;
+import com.liang.dal.mapper.ProcessNodeSqlMapper;
 import com.liang.service.ProcessService;
 import com.liang.service.support.constants.NodeType;
 import com.liang.service.support.dto.ProcessBaseDTO;
 import com.liang.service.support.dto.ProcessDTO;
 import com.liang.service.support.dto.ProcessNodeDTO;
+import com.liang.service.support.dto.ProcessSqlDTO;
 import com.liang.service.support.dto.converter.ProcessDTOConverter;
 import com.liang.service.support.utils.UUIDUtil;
 
@@ -19,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -29,6 +33,7 @@ import java.util.stream.Collectors;
 public class ProcessServiceImpl implements ProcessService {
     @Autowired private ProcessMapper processMapper;
     @Autowired private ProcessNodeMapper processNodeMapper;
+    @Autowired private ProcessNodeSqlMapper processNodeSqlMapper;
 
     @Transactional
     @Override
@@ -73,6 +78,7 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public void deleteNode(String nodeId) {
         processNodeMapper.delete(nodeId);
+        processNodeSqlMapper.delete(nodeId);
         System.out.println("删除流程节点: " + nodeId);
     }
 
@@ -85,11 +91,17 @@ public class ProcessServiceImpl implements ProcessService {
 
         List<ProcessNodeDO> nodeDOList = processNodeMapper.select(processId);
         if (CollectionUtils.isEmpty(nodeDOList)) return dto;
+
+        Map<String, ProcessNodeSqlDO> nodeSqlMap = getNodeSqlMap(processId);
         for (ProcessNodeDO nodeDO : nodeDOList) {
             ProcessNodeDTO nodeDTO = new ProcessNodeDTO();
             BeanUtils.copyProperties(nodeDO, nodeDTO);
             if (NodeType.ROOT.name().equals(nodeDTO.getNodeType())) dto.setRoot(nodeDTO);
             dto.getNodes().add(nodeDTO);
+            nodeDTO.setSql(
+                    Optional.ofNullable(nodeSqlMap.get(nodeDO.getNodeId()))
+                            .map(ProcessNodeSqlDO::getSqlText)
+                            .orElse(""));
         }
 
         return dto;
@@ -109,8 +121,11 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     @Override
-    public void saveSql(String nodeId, String connectionId, String sql) {
-        System.out.println("保存了sql");
+    public void saveNodeSql(ProcessSqlDTO dto) {
+        ProcessNodeSqlDO sqlDO = new ProcessNodeSqlDO();
+        BeanUtils.copyProperties(dto, sqlDO);
+
+        processNodeSqlMapper.insertOrUpdate(sqlDO);
     }
 
     private List<ProcessBaseDTO> listProcess(List<String> processIds) {
@@ -133,8 +148,17 @@ public class ProcessServiceImpl implements ProcessService {
      * @return Map<processId, rootDTO>
      */
     private Map<String, ProcessNodeDTO> getProcessRootMap(List<String> processIds) {
+        // 获取流程根节点
         List<ProcessNodeDO> rootList = processNodeMapper.selectRoot(processIds);
         if (CollectionUtils.isEmpty(rootList)) return Collections.emptyMap();
+
+        // 获取根节点的sql
+        List<String> nodeIds = rootList.stream().map(ProcessNodeDO::getNodeId).toList();
+        List<ProcessNodeSqlDO> sqlDOList = processNodeSqlMapper.selectBatch(nodeIds);
+        Map<String, ProcessNodeSqlDO> nodeSqlMap =
+                Optional.ofNullable(sqlDOList).orElse(Collections.emptyList()).stream()
+                        .collect(
+                                Collectors.toMap(ProcessNodeSqlDO::getNodeId, Function.identity()));
 
         return rootList.stream()
                 .collect(
@@ -143,7 +167,24 @@ public class ProcessServiceImpl implements ProcessService {
                                 nodeDO -> {
                                     ProcessNodeDTO dto = new ProcessNodeDTO();
                                     BeanUtils.copyProperties(nodeDO, dto);
+                                    ProcessNodeSqlDO sqlDO = nodeSqlMap.get(dto.getNodeId());
+                                    dto.setConnectionId(
+                                            Optional.ofNullable(sqlDO)
+                                                    .map(ProcessNodeSqlDO::getConnectionId)
+                                                    .orElse(""));
+                                    dto.setSql(
+                                            Optional.ofNullable(sqlDO)
+                                                    .map(ProcessNodeSqlDO::getSqlText)
+                                                    .orElse(""));
                                     return dto;
                                 }));
+    }
+
+    private Map<String, ProcessNodeSqlDO> getNodeSqlMap(String processId) {
+        List<ProcessNodeSqlDO> nodeSqlList = processNodeSqlMapper.select(processId);
+        if (CollectionUtils.isEmpty(nodeSqlList)) return Collections.emptyMap();
+
+        return nodeSqlList.stream()
+                .collect(Collectors.toMap(ProcessNodeSqlDO::getNodeId, Function.identity()));
     }
 }

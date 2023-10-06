@@ -21,5 +21,7 @@ public class ProcessNodeDTO {
 
     private String nodeType;
 
+    private String connectionId;
+
     private String sql;
 }

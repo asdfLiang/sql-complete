@@ -16,7 +16,7 @@
         <Line endY="30"/>
         <VBox alignment="TOP_CENTER">
             <ChoiceBox fx:id="connectionChoice" prefWidth="350" maxWidth="350"/>
-            <TextArea fx:id="processSql" prefWidth="350" prefHeight="200" maxWidth="350" maxHeight="200"/>
+            <TextArea fx:id="sqlTextArea" prefWidth="350" prefHeight="200" maxWidth="350" maxHeight="200"/>
         </VBox>
         <Line endY="30"/>
         <Button prefWidth="25" prefHeight="25" text="+" onAction="#addSubNodeToRoot"/>

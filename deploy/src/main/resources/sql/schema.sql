@@ -67,4 +67,22 @@ create table main.process_session
 create index main.idx_process_id
     on main.process_session (process_id);
 
+-- 节点sql表
+create table main.process_node_sql
+(
+    id            INTEGER not null
+        constraint pk_id
+            primary key,
+    process_id    TEXT    not null,
+    node_id       TEXT    not null,
+    connection_id TEXT,
+    sql_text      TEXT,
+    create_time   REAL    not null,
+    modify_time   REAL    not null
+);
+
+create unique index main.uni_node_id
+    on main.process_node_sql (node_id);
+
+
 
