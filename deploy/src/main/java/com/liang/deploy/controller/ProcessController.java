@@ -4,6 +4,7 @@ import com.liang.deploy.jfx.AlertAction;
 import com.liang.deploy.vo.NodeData;
 import com.liang.service.ProcessService;
 import com.liang.service.support.constants.NodeType;
+import com.liang.service.support.dto.ConnectionDTO;
 import com.liang.service.support.dto.ProcessDTO;
 import com.liang.service.support.dto.ProcessNodeDTO;
 import com.liang.service.support.events.ProcessTabSelectedEvent;
@@ -14,11 +15,13 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Line;
+import javafx.util.StringConverter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +31,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -45,6 +49,10 @@ public class ProcessController {
     @FXML
     public void initialize() {
         processRoot.setUserData(new NodeData(null, null, rootSubNodes));
+        ChoiceBox<ConnectionDTO> connectionChoice =
+                (ChoiceBox<ConnectionDTO>) processRoot.lookup("#connectionChoice");
+
+        initConnectionChoice(connectionChoice);
     }
 
     @FXML
@@ -175,15 +183,39 @@ public class ProcessController {
         double TEXT_AREA_WIDTH = 350;
         double TEXT_AREA_HEIGHT = 200;
 
+        ChoiceBox<ConnectionDTO> choiceBox = new ChoiceBox<>();
+        choiceBox.setPrefWidth(TEXT_AREA_WIDTH);
+        choiceBox.setMaxWidth(TEXT_AREA_WIDTH);
+        initConnectionChoice(choiceBox);
+
         TextArea textArea = new TextArea();
         textArea.setPrefWidth(TEXT_AREA_WIDTH);
         textArea.setPrefHeight(TEXT_AREA_HEIGHT);
         textArea.setMaxWidth(TEXT_AREA_WIDTH);
 
-        HBox hBox = new HBox();
-        hBox.setAlignment(Pos.TOP_CENTER);
-        hBox.getChildren().add(textArea);
-        return hBox;
+        VBox vBox = new VBox();
+        vBox.setAlignment(Pos.TOP_CENTER);
+        vBox.getChildren().addAll(choiceBox, textArea);
+        return vBox;
+    }
+
+    private void initConnectionChoice(ChoiceBox<ConnectionDTO> connectionChoice) {
+        connectionChoice.setItems(sessionContext.getConnectionList());
+
+        connectionChoice.setConverter(
+                new StringConverter<>() {
+                    @Override
+                    public String toString(ConnectionDTO dto) {
+                        return Optional.ofNullable(dto)
+                                .map(ConnectionDTO::getConnectionName)
+                                .orElse("");
+                    }
+
+                    @Override
+                    public ConnectionDTO fromString(String string) {
+                        return null;
+                    }
+                });
     }
 
     @EventListener(classes = {ProcessTabSelectedEvent.class})

@@ -153,6 +153,8 @@ public class MainController {
             TreeItem<ConnectionItemVO> item = new TreeItem<>(itemVO);
             root.getChildren().add(item);
         }
+
+        sessionContext.flushConnectionList(all);
     }
 
     private Tab addTab(String sessionId, ProcessBaseDTO processDTO) {
