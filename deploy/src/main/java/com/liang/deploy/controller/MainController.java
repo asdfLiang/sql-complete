@@ -24,7 +24,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -33,7 +32,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -191,7 +189,7 @@ public class MainController {
         //
         ChoiceBox<ConnectionDTO> choiceBox =
                 (ChoiceBox<ConnectionDTO>) processRoot.lookup("#connectionChoice");
-        selectConnection(choiceBox, processDTO.getRoot());
+        processEventHandler.selectConnection(choiceBox, processDTO.getRoot().getConnectionId());
 
         //
         TextArea sqlTextArea = (TextArea) view.lookup("#sqlTextArea");
@@ -207,22 +205,6 @@ public class MainController {
                 .addListener(
                         processEventHandler.saveSqlEventHandler(sqlTextArea, choiceBox, sqlDTO));
         return processRoot;
-    }
-
-    private void selectConnection(ChoiceBox<ConnectionDTO> choiceBox, ProcessNodeDTO root) {
-        String connectionId = root.getConnectionId();
-        if (StringUtils.isNotBlank(connectionId)) {
-            ConnectionDTO connectionDTO =
-                    choiceBox.getItems().stream()
-                            .filter(elm -> StringUtils.equals(elm.getConnectionId(), connectionId))
-                            .findFirst()
-                            .orElse(null);
-            //
-            if (Objects.nonNull(connectionDTO)) choiceBox.getSelectionModel().select(connectionDTO);
-            else choiceBox.getSelectionModel().select(0);
-        } else {
-            choiceBox.getSelectionModel().select(0);
-        }
     }
 
     private void handleTabClosedEvent(String sessionId, Tab tab) {

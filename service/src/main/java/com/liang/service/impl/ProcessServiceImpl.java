@@ -98,10 +98,12 @@ public class ProcessServiceImpl implements ProcessService {
             BeanUtils.copyProperties(nodeDO, nodeDTO);
             if (NodeType.ROOT.name().equals(nodeDTO.getNodeType())) dto.setRoot(nodeDTO);
             dto.getNodes().add(nodeDTO);
-            nodeDTO.setSql(
-                    Optional.ofNullable(nodeSqlMap.get(nodeDO.getNodeId()))
-                            .map(ProcessNodeSqlDO::getSqlText)
-                            .orElse(""));
+
+            ProcessNodeSqlDO sqlDO = nodeSqlMap.get(nodeDO.getNodeId());
+            if (Objects.isNull(sqlDO)) continue;
+
+            nodeDTO.setConnectionId(sqlDO.getConnectionId());
+            nodeDTO.setSql(sqlDO.getSqlText());
         }
 
         return dto;
@@ -168,14 +170,10 @@ public class ProcessServiceImpl implements ProcessService {
                                     ProcessNodeDTO dto = new ProcessNodeDTO();
                                     BeanUtils.copyProperties(nodeDO, dto);
                                     ProcessNodeSqlDO sqlDO = nodeSqlMap.get(dto.getNodeId());
-                                    dto.setConnectionId(
-                                            Optional.ofNullable(sqlDO)
-                                                    .map(ProcessNodeSqlDO::getConnectionId)
-                                                    .orElse(""));
-                                    dto.setSql(
-                                            Optional.ofNullable(sqlDO)
-                                                    .map(ProcessNodeSqlDO::getSqlText)
-                                                    .orElse(""));
+                                    if (Objects.isNull(sqlDO)) return dto;
+
+                                    dto.setConnectionId(sqlDO.getConnectionId());
+                                    dto.setSql(sqlDO.getSqlText());
                                     return dto;
                                 }));
     }

@@ -1,7 +1,7 @@
 package com.liang.deploy.controller;
 
-import com.liang.deploy.jfx.AlertAction;
 import com.liang.deploy.controller.handler.ProcessEventHandler;
+import com.liang.deploy.jfx.AlertAction;
 import com.liang.deploy.vo.NodeData;
 import com.liang.service.ProcessService;
 import com.liang.service.support.constants.NodeType;
@@ -194,11 +194,13 @@ public class ProcessController {
         choiceBox.setPrefWidth(TEXT_AREA_WIDTH);
         choiceBox.setMaxWidth(TEXT_AREA_WIDTH);
         initConnectionChoice(choiceBox);
+        processEventHandler.selectConnection(choiceBox, subNodeDTO.getConnectionId());
 
         TextArea sqlTextArea = new TextArea();
         sqlTextArea.setPrefWidth(TEXT_AREA_WIDTH);
         sqlTextArea.setPrefHeight(TEXT_AREA_HEIGHT);
         sqlTextArea.setMaxWidth(TEXT_AREA_WIDTH);
+        sqlTextArea.setText(subNodeDTO.getSql());
 
         ProcessSqlDTO sqlDTO = new ProcessSqlDTO();
         BeanUtils.copyProperties(subNodeDTO, sqlDTO);

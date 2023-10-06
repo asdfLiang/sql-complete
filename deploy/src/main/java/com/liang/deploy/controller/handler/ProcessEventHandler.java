@@ -40,4 +40,19 @@ public class ProcessEventHandler {
             processService.saveNodeSql(dto);
         };
     }
+
+    public void selectConnection(ChoiceBox<ConnectionDTO> choiceBox, String connectionId) {
+        if (StringUtils.isNotBlank(connectionId)) {
+            ConnectionDTO connectionDTO =
+                    choiceBox.getItems().stream()
+                            .filter(elm -> StringUtils.equals(elm.getConnectionId(), connectionId))
+                            .findFirst()
+                            .orElse(null);
+            //
+            if (Objects.nonNull(connectionDTO)) choiceBox.getSelectionModel().select(connectionDTO);
+            else choiceBox.getSelectionModel().select(0);
+        } else {
+            choiceBox.getSelectionModel().select(0);
+        }
+    }
 }
