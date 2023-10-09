@@ -8,7 +8,11 @@
 
 ### 创建连接
 
+![image](https://github.com/asdfLiang/sql-complete/blob/master/deploy/src/main/resources/guide/new_connection.png)
+
 ### 创建流程
+
+![image](https://github.com/asdfLiang/sql-complete/blob/master/deploy/src/main/resources/guide/process.png)
 
 ## 项目结构
 
@@ -20,7 +24,6 @@ sql-complete
 ```
 
 ## 环境说明
-
 
 ## 部署说明
 
