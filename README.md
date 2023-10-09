@@ -8,11 +8,15 @@
 
 ### 创建连接
 
-![image](https://github.com/asdfLiang/sql-complete/blob/master/deploy/src/main/resources/guide/new_connection.png)
+<img src="https://github.com/asdfLiang/sql-complete/blob/master/deploy/src/main/resources/guide/new_connection.png" width= "500px">
 
 ### 创建流程
 
-![image](https://github.com/asdfLiang/sql-complete/blob/master/deploy/src/main/resources/guide/process.png)
+<img src="https://github.com/asdfLiang/sql-complete/blob/master/deploy/src/main/resources/guide/process.png" width= "500px">
+
+### 执行结果
+
+待开发
 
 ## 项目结构
 
@@ -23,8 +27,6 @@ sql-complete
 └── dal -- 持久化模块，保存用户设置的sql流程结构、sql语句及会话等数据
 ```
 
-## 环境说明
-
 ## 部署说明
 
 #### 环境说明
@@ -33,7 +35,7 @@ sql-complete
 2. JavaFx SDK 20
 3. sqlite3
 
-#### 部署过程
+#### 启动过程
 
 1. 下载并解压 JavaFx SDK 到本地，下载地址：https://openjfx.cn/
 2. Idea添加VM参数：--module-path "E:\produce\javafx-sdk-20\lib" --add-modules javafx.controls,javafx.fxml
