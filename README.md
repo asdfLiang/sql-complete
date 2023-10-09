@@ -21,14 +21,20 @@ sql-complete
 
 ## 环境说明
 
+
+## 部署说明
+
+#### 环境说明
+
 1. JDK17
 2. JavaFx SDK 20
 3. sqlite3
 
-## 部署说明
+#### 部署过程
 
 1. 下载并解压 JavaFx SDK 到本地，下载地址：https://openjfx.cn/
-2. Idea添加VM参数：--module-path "E:\produce\javafx-sdk-20\lib" --add-modules javafx.controls,javafx.fxml，启动项目
+2. Idea添加VM参数：--module-path "E:\produce\javafx-sdk-20\lib" --add-modules javafx.controls,javafx.fxml
+3. 启动项目
 
 ## 项目进度
 
