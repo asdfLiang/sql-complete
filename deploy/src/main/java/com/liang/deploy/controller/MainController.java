@@ -46,12 +46,11 @@ public class MainController {
     @FXML private TreeView<ConnectionItemVO> connectionTree;
     @FXML private TabPane processTabPane;
 
-    @Autowired private SpringFXMLLoader springFXMLLoader;
-
     @Autowired private ConnectionService connectionService;
     @Autowired private ProcessService processService;
     @Autowired private ProcessSessionService processSessionService;
 
+    @Autowired private SpringFXMLLoader springFXMLLoader;
     @Autowired private SessionContext sessionContext;
     @Autowired private ProcessEventHandler processEventHandler;
     @Autowired private ApplicationEventPublisher applicationEventPublisher;
@@ -74,7 +73,7 @@ public class MainController {
     public void openNewProcessTab() {
         int size = processTabPane.getTabs().size();
         System.out.println(size);
-        // 保存流程到数据库，并回填根节点信息
+        // 保存流程到数据库
         ProcessDTO processDTO = processService.save(new ProcessDTO("新建流程" + size));
 
         // 创建会话
@@ -165,12 +164,11 @@ public class MainController {
         // 加载流程布局
         Parent view = springFXMLLoader.load("/fxml/process-root.fxml");
         ScrollPane scrollPane = new ScrollPane(view);
-        scrollPane.setStyle("-fx-background-color: green");
 
         // 填充节点数据
         VBox processRoot = populateRootData(processDTO, view);
 
-        // 创建tab
+        // 放到tab里
         Tab tab = new Tab(processDTO.getProcessName(), scrollPane);
         tab.selectedProperty().addListener(handleTabSelectedEvent(processRoot, tab));
         tab.setOnClosed(event -> handleTabClosedEvent(sessionId, tab));
