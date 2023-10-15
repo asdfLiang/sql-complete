@@ -17,6 +17,7 @@ import de.felixroske.jfxsupport.FXMLController;
 
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -162,11 +163,13 @@ public class MainController {
 
     private Tab addTab(String sessionId, ProcessBaseDTO processDTO) {
         // 加载流程布局
-        Parent view = springFXMLLoader.load("/fxml/process-root.fxml");
-        ScrollPane scrollPane = new ScrollPane(view);
+        SplitPane splitPane = springFXMLLoader.load("/fxml/process-root.fxml");
+        ScrollPane scrollPane = new ScrollPane(splitPane);
+        splitPane.prefHeightProperty().bind(scrollPane.heightProperty());
+        splitPane.prefWidthProperty().bind(scrollPane.widthProperty());
 
         // 填充节点数据
-        VBox processRoot = populateRootData(processDTO, view);
+        VBox processRoot = populateRootData(processDTO, splitPane);
 
         // 放到tab里
         Tab tab = new Tab(processDTO.getProcessName(), scrollPane);
@@ -179,8 +182,8 @@ public class MainController {
         return tab;
     }
 
-    private VBox populateRootData(ProcessBaseDTO processDTO, Parent view) {
-        VBox processRoot = (VBox) view.lookup("#processRoot");
+    private VBox populateRootData(ProcessBaseDTO processDTO, SplitPane splitPane) {
+        VBox processRoot = (VBox) getProcessPane(splitPane).lookup("#processRoot");
         NodeData nodeData = (NodeData) processRoot.getUserData();
         nodeData.setProcessId(processDTO.getProcessId());
         nodeData.setNodeId(processDTO.getRoot().getNodeId());
@@ -190,7 +193,7 @@ public class MainController {
         processEventHandler.selectConnection(choiceBox, processDTO.getRoot().getConnectionId());
 
         //
-        TextArea sqlTextArea = (TextArea) view.lookup("#sqlTextArea");
+        TextArea sqlTextArea = (TextArea) processRoot.lookup("#sqlTextArea");
         sqlTextArea.setText(processDTO.getRoot().getSql());
         ProcessSqlDTO sqlDTO = new ProcessSqlDTO();
         BeanUtils.copyProperties(nodeData, sqlDTO);
@@ -203,6 +206,11 @@ public class MainController {
                 .addListener(
                         processEventHandler.saveSqlEventHandler(sqlTextArea, choiceBox, sqlDTO));
         return processRoot;
+    }
+
+    private static Node getProcessPane(Parent view) {
+        SplitPane splitPane = (SplitPane) view;
+        return splitPane.getItems().get(0);
     }
 
     private void handleTabClosedEvent(String sessionId, Tab tab) {
