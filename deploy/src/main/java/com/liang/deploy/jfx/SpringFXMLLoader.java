@@ -3,8 +3,8 @@ package com.liang.deploy.jfx;
 import com.liang.service.support.exceptions.BaseException;
 
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 
+import javafx.scene.Parent;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +35,7 @@ public class SpringFXMLLoader {
         this.context = context;
     }
 
-    public Parent load(String fxmlPath) {
+    public <T extends Parent> T load(String fxmlPath) {
         FXMLLoader loader = new FXMLLoader();
         loader.setControllerFactory(context::getBean); // Spring now FXML Controller Factory
         // loader.setResources(resourceBundle);

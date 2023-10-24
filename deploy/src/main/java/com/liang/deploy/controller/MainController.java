@@ -20,6 +20,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -162,11 +163,11 @@ public class MainController {
 
     private Tab addTab(String sessionId, ProcessBaseDTO processDTO) {
         // 加载流程布局
-        Parent view = springFXMLLoader.load("/fxml/process-root.fxml");
-        ScrollPane scrollPane = new ScrollPane(view);
+        AnchorPane processPane = springFXMLLoader.load("/fxml/process-root.fxml");
+        ScrollPane scrollPane = new ScrollPane(processPane);
 
         // 填充节点数据
-        VBox processRoot = populateRootData(processDTO, view);
+        VBox processRoot = populateRootData(processDTO, processPane);
 
         // 放到tab里
         Tab tab = new Tab(processDTO.getProcessName(), scrollPane);
