@@ -249,11 +249,11 @@ public class ProcessController {
     private void buildProcessTree(VBox rootNode) {
         NodeData userData = (NodeData) rootNode.getUserData();
         ProcessDTO processDTO = processService.get(userData.getProcessId());
-        if (Objects.isNull(processDTO) || CollectionUtils.isEmpty(processDTO.getNodes())) return;
+        if (Objects.isNull(processDTO) || CollectionUtils.isEmpty(processDTO.getAllNodes())) return;
 
         // Map<parentId, List<SubNodeDTO>>
         Map<String, List<ProcessNodeDTO>> subNodeDataMap =
-                processDTO.getNodes().stream()
+                processDTO.getAllNodes().stream()
                         .filter(dto -> StringUtils.isNotBlank(dto.getParentId()))
                         .collect(Collectors.groupingBy(ProcessNodeDTO::getParentId));
         if (CollectionUtils.isEmpty(subNodeDataMap)) return;

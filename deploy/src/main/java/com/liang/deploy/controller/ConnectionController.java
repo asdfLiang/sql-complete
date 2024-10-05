@@ -1,6 +1,6 @@
 package com.liang.deploy.controller;
 
-import static com.liang.service.support.constants.Constants.JDBC_REGEX;
+import static com.liang.service.support.constants.Constants.JDBC_URL_REGEX;
 
 import com.liang.deploy.jfx.AlertAction;
 import com.liang.service.ConnectionService;
@@ -85,7 +85,7 @@ public class ConnectionController {
         }
 
         // url校验
-        if (url.isEmpty() || url.length() > 200 || !url.matches(JDBC_REGEX)) {
+        if (url.isEmpty() || url.length() > 200 || !url.matches(JDBC_URL_REGEX)) {
             urlField.setStyle("-fx-border-color: red; -fx-border-radius: 3");
             isValid = false;
         } else {

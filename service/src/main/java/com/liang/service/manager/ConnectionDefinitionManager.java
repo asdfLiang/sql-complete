@@ -65,11 +65,11 @@ public class ConnectionDefinitionManager {
     }
 
     public String getSchemaName(String url) {
-        if (StringUtils.isBlank(url) || !url.matches(Constants.JDBC_REGEX)) {
+        if (StringUtils.isBlank(url) || !url.matches(Constants.JDBC_URL_REGEX)) {
             return null;
         }
 
-        return url.replaceAll(Constants.JDBC_REGEX, "$1");
+        return url.replaceAll(Constants.JDBC_URL_REGEX, "$1");
     }
 
     public static void main(String[] args) {
@@ -77,9 +77,9 @@ public class ConnectionDefinitionManager {
         String url1 = "jdbc";
         String url2 = "1234";
         String url3 = "jdbc:mysql://localhost:3306/test";
-        System.out.println(url1.matches(Constants.JDBC_REGEX));
-        System.out.println(url2.matches(Constants.JDBC_REGEX));
-        System.out.println(url3.matches(Constants.JDBC_REGEX));
+        System.out.println(url1.matches(Constants.JDBC_URL_REGEX));
+        System.out.println(url2.matches(Constants.JDBC_URL_REGEX));
+        System.out.println(url3.matches(Constants.JDBC_URL_REGEX));
 
         System.out.println(manager.getSchemaName(url1));
         System.out.println(manager.getSchemaName(url2));

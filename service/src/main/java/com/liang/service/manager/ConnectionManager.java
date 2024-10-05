@@ -68,7 +68,7 @@ public class ConnectionManager {
         configuration.setJdbcUrl(connectionDO.getUrl());
         configuration.setUsername(connectionDO.getUsername());
         configuration.setPassword(connectionDO.getPassword());
-        configuration.setDriverClassName(Constants.MYSQL_8_CLASS_NAME);
+        configuration.setDriverClassName(Constants.MYSQL_8_DRIVER_CLASS_NAME);
         configuration.setMaximumPoolSize(5);
 
         return new HikariDataSource(configuration);

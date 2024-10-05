@@ -6,6 +6,7 @@ import com.liang.deploy.vo.ConnectionItemVO;
 import com.liang.deploy.vo.NodeData;
 import com.liang.deploy.vo.converter.ConnectionVOConverter;
 import com.liang.service.ConnectionService;
+import com.liang.service.ExecuteService;
 import com.liang.service.ProcessService;
 import com.liang.service.ProcessSessionService;
 import com.liang.service.support.dto.*;
@@ -31,6 +32,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.util.CollectionUtils;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -43,18 +45,28 @@ import java.util.stream.Collectors;
 @FXMLController
 public class MainController {
     private final Stage rootStage = AbstractJavaFxApplicationSupport.getStage();
+    // TODO 结果如何添加到新窗口？
+    private static final Map<Tab, Tab> resultCollector = new HashMap<>();
 
     @FXML private TreeView<ConnectionItemVO> connectionTree;
     @FXML private TabPane processTabPane;
 
     @Autowired private ConnectionService connectionService;
-    @Autowired private ProcessService processService;
     @Autowired private ProcessSessionService processSessionService;
+    @Autowired private ProcessService processService;
+    @Autowired private ExecuteService executeService;
 
-    @Autowired private SpringFXMLLoader springFXMLLoader;
     @Autowired private SessionContext sessionContext;
     @Autowired private ProcessEventHandler processEventHandler;
+
+    @Autowired private SpringFXMLLoader springFXMLLoader;
     @Autowired private ApplicationEventPublisher applicationEventPublisher;
+
+    @FXML
+    public void initialize() {
+        initConnectionTree();
+        initProcessTabPane();
+    }
 
     /** 打开新建连接窗口 */
     @FXML
@@ -86,15 +98,8 @@ public class MainController {
         sessionContext.switchTab(tab);
     }
 
-    @FXML
-    public void initialize() {
-        initConnectionTree();
-
-        initProcessTab();
-    }
-
-    /** 初始化tab */
-    private void initProcessTab() {
+    /** 初始化tabPane，加载所有已打开的会话 */
+    private void initProcessTabPane() {
         // 查询未关闭会话
         List<ProcessSessionDTO> sessions = processSessionService.list();
         if (CollectionUtils.isEmpty(sessions)) return;
@@ -142,6 +147,7 @@ public class MainController {
         connectionTree.getRoot().setExpanded(true);
     }
 
+    /** 刷新连接列表 */
     @EventListener(classes = {ConnectionsChangeEvent.class})
     public void flushConnectionList() {
         TreeItem<ConnectionItemVO> root = connectionTree.getRoot();
@@ -161,6 +167,7 @@ public class MainController {
         sessionContext.flushConnectionList(all);
     }
 
+    /** 增加节点 */
     private Tab addTab(String sessionId, ProcessBaseDTO processDTO) {
         // 加载流程布局
         AnchorPane processPane = springFXMLLoader.load("/fxml/process-root.fxml");
@@ -168,6 +175,9 @@ public class MainController {
 
         // 填充节点数据
         VBox processRoot = populateRootData(processDTO, processPane);
+
+        // 绑定开始执行事件
+        bindStartButtonAction(processDTO, processPane);
 
         // 放到tab里
         Tab tab = new Tab(processDTO.getProcessName(), scrollPane);
@@ -180,8 +190,21 @@ public class MainController {
         return tab;
     }
 
-    private VBox populateRootData(ProcessBaseDTO processDTO, Parent view) {
-        VBox processRoot = (VBox) view.lookup("#processRoot");
+    private void bindStartButtonAction(ProcessBaseDTO processDTO, AnchorPane processPane) {
+        Button startButton = (Button) processPane.lookup("#startButton");
+
+        startButton.setOnAction(
+                event -> {
+                    // TODO 检查节点和数据是否一致
+
+                    // TODO
+
+                    executeService.execute(processDTO.getProcessId());
+                });
+    }
+
+    private VBox populateRootData(ProcessBaseDTO processDTO, AnchorPane processPane) {
+        VBox processRoot = (VBox) processPane.lookup("#processRoot");
         NodeData nodeData = (NodeData) processRoot.getUserData();
         nodeData.setProcessId(processDTO.getProcessId());
         nodeData.setNodeId(processDTO.getRoot().getNodeId());
@@ -191,7 +214,7 @@ public class MainController {
         processEventHandler.selectConnection(choiceBox, processDTO.getRoot().getConnectionId());
 
         //
-        TextArea sqlTextArea = (TextArea) view.lookup("#sqlTextArea");
+        TextArea sqlTextArea = (TextArea) processPane.lookup("#sqlTextArea");
         sqlTextArea.setText(processDTO.getRoot().getSql());
         ProcessSqlDTO sqlDTO = new ProcessSqlDTO();
         BeanUtils.copyProperties(nodeData, sqlDTO);
@@ -206,6 +229,7 @@ public class MainController {
         return processRoot;
     }
 
+    /** tab关闭事件 */
     private void handleTabClosedEvent(String sessionId, Tab tab) {
         processSessionService.closeSession(sessionId);
         sessionContext.removeTab(tab);

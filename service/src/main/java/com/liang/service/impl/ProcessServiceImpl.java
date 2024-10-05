@@ -56,7 +56,7 @@ public class ProcessServiceImpl implements ProcessService {
         processDTO.setProcessId(processDO.getProcessId());
         processDTO.setProcessName(processDO.getProcessName());
         processDTO.setRoot(ProcessDTOConverter.convert(rootDO));
-        processDTO.setNodes(Collections.singletonList(processDTO.getRoot()));
+        processDTO.setAllNodes(Collections.singletonList(processDTO.getRoot()));
 
         System.out.println("保存流程：" + processDTO);
         return processDTO;
@@ -97,7 +97,7 @@ public class ProcessServiceImpl implements ProcessService {
             ProcessNodeDTO nodeDTO = new ProcessNodeDTO();
             BeanUtils.copyProperties(nodeDO, nodeDTO);
             if (NodeType.ROOT.name().equals(nodeDTO.getNodeType())) dto.setRoot(nodeDTO);
-            dto.getNodes().add(nodeDTO);
+            dto.getAllNodes().add(nodeDTO);
 
             ProcessNodeSqlDO sqlDO = nodeSqlMap.get(nodeDO.getNodeId());
             if (Objects.isNull(sqlDO)) continue;

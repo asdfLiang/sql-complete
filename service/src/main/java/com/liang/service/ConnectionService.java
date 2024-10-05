@@ -7,6 +7,8 @@ import com.liang.service.support.dto.TableDTO;
 import java.util.List;
 
 /**
+ * 连接管理服务
+ *
  * @since 2023/9/9 15:28
  * @author by liangzj
  */

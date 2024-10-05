@@ -16,7 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 public class ProcessDTO extends ProcessBaseDTO {
 
-    private List<ProcessNodeDTO> nodes = new ArrayList<>();
+    private List<ProcessNodeDTO> allNodes = new ArrayList<>();
 
     public ProcessDTO(String processName) {
         super(processName);

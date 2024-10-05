@@ -5,7 +5,7 @@ package com.liang.service.support.constants;
  * @author by liangzj
  */
 public final class Constants {
-    public static final String JDBC_REGEX = "jdbc:mysql://[^/]+/(\\w+).*";
+    public static final String JDBC_URL_REGEX = "jdbc:mysql://[^/]+/(\\w+).*";
 
-    public static final String MYSQL_8_CLASS_NAME = "com.mysql.cj.jdbc.Driver";
+    public static final String MYSQL_8_DRIVER_CLASS_NAME = "com.mysql.cj.jdbc.Driver";
 }

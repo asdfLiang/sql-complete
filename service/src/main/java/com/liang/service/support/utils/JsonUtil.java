@@ -10,7 +10,7 @@ import java.io.InputStream;
  * @author by liangzj
  * @since 2022/8/30 23:40
  */
-public class Json {
+public class JsonUtil {
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
